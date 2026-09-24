@@ -1,14 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --color-cream: #faf6f0;
-  --color-ink: #2a2420;
-  --color-ink-soft: #5c534c;
-  --color-amber: #b5652f;
-  --color-amber-dark: #96501f;
-  --color-amber-light: #e8c9a8;
-  --color-sage: #6b7a5e;
-  --color-border: #e7ddd0;
+  --color-cream: #fffaf8;
+  --color-ink: #1f0352;
+  --color-ink-soft: #6d5b8f;
+  /* Brand pinks — amber/rose are the two majorly-used shades; amber-dark is
+     a deepened derivative (not one of the 5 given hexes) used only where
+     text-level contrast is required, since the pastels alone fail WCAG AA
+     as text/hover-with-light-text colors. amber-light/blush/peach are the
+     3 minimal-use shades, reserved for gradients and soft tints. */
+  --color-amber: #ff8dc7;
+  --color-rose: #ffacc7;
+  --color-amber-dark: #a55698;
+  --color-amber-light: #ffddd2;
+  --color-blush: #ffb9b9;
+  --color-peach: #e1b7c2;
+  --color-border: #f4e6ea;
 }
 
 @theme inline {
@@ -16,9 +23,11 @@
   --color-ink: var(--color-ink);
   --color-ink-soft: var(--color-ink-soft);
   --color-amber: var(--color-amber);
+  --color-rose: var(--color-rose);
   --color-amber-dark: var(--color-amber-dark);
   --color-amber-light: var(--color-amber-light);
-  --color-sage: var(--color-sage);
+  --color-blush: var(--color-blush);
+  --color-peach: var(--color-peach);
   --color-border-soft: var(--color-border);
   --font-display: var(--font-fraunces);
   --font-sans: var(--font-inter);

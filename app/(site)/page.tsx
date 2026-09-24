@@ -38,7 +38,7 @@ export default async function HomePage() {
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-border-soft/70">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-amber-light/50 via-cream to-cream" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-amber/20 via-blush/15 to-cream" />
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-4 py-20 text-center sm:px-6 sm:py-28">
           <span className="animate-fade-in-up inline-flex items-center gap-1.5 rounded-full border border-amber/30 bg-white/70 px-4 py-1.5 text-xs font-medium tracking-wide text-amber-dark">
             <Sparkles className="h-3.5 w-3.5" /> Handmade in small batches
@@ -122,7 +122,7 @@ export default async function HomePage() {
       {/* Meet the Maker */}
       <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-24">
         <div className="flex flex-col items-center gap-8 sm:flex-row sm:items-start">
-          <div className="flex h-28 w-28 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-light to-amber/40 text-amber-dark">
+          <div className="flex h-28 w-28 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-peach/60 via-amber-light to-amber/50 text-amber-dark">
             <Droplets className="h-10 w-10" strokeWidth={1.5} />
           </div>
           <div className="text-center sm:text-left">
