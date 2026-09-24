@@ -3,13 +3,16 @@ import { Plus } from "lucide-react";
 import { Input } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
 import { CategoryRow } from "@/components/admin/CategoryRow";
-import { getAllCategories } from "@/lib/data/categories";
+import { getActiveProductCountsByCategory, getAllCategories } from "@/lib/data/categories";
 import { createCategoryAction } from "./actions";
 
 export const metadata: Metadata = { title: "Categories" };
 
 export default async function AdminCategoriesPage() {
-  const categories = await getAllCategories();
+  const [categories, productCounts] = await Promise.all([
+    getAllCategories(),
+    getActiveProductCountsByCategory(),
+  ]);
 
   const homeOrder = categories
     .filter((c) => c.show_on_home)
@@ -45,6 +48,7 @@ export default async function AdminCategoriesPage() {
               <CategoryRow
                 key={category.id}
                 category={category}
+                productCount={productCounts[category.id] ?? 0}
                 isFirstOnHome={homeIndex <= 0}
                 isLastOnHome={homeIndex === -1 || homeIndex === homeOrder.length - 1}
               />

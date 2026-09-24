@@ -43,6 +43,26 @@ export async function getHomeCategories(): Promise<Category[]> {
   }
 }
 
+/** Active-product count per category id — used to warn when a homepage row would render empty. */
+export async function getActiveProductCountsByCategory(): Promise<Record<string, number>> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("product_categories")
+    .select("category_id, products!inner(is_active)")
+    .eq("products.is_active", true);
+
+  if (error) {
+    console.error("getActiveProductCountsByCategory error", error);
+    return {};
+  }
+
+  const counts: Record<string, number> = {};
+  for (const row of data as { category_id: string }[]) {
+    counts[row.category_id] = (counts[row.category_id] ?? 0) + 1;
+  }
+  return counts;
+}
+
 async function uniqueSlug(supabase: Awaited<ReturnType<typeof createClient>>, base: string, excludeId?: string) {
   let slug = toSlug(base) || "category";
   let suffix = 1;

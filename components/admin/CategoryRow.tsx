@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, ChevronDown, ChevronUp, Pencil, Trash2, X } from "lucide-react";
+import { AlertTriangle, Check, ChevronDown, ChevronUp, Pencil, Trash2, X } from "lucide-react";
 import { Input } from "@/components/ui/Field";
 import { SortWeightInput } from "@/components/admin/SortWeightInput";
 import {
@@ -15,13 +15,16 @@ import type { Category } from "@/types";
 
 export function CategoryRow({
   category,
+  productCount,
   isFirstOnHome,
   isLastOnHome,
 }: {
   category: Category;
+  productCount: number;
   isFirstOnHome: boolean;
   isLastOnHome: boolean;
 }) {
+  const emptyOnHome = category.show_on_home && productCount === 0;
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(category.name);
   const [saving, setSaving] = useState(false);
@@ -120,6 +123,14 @@ export function CategoryRow({
           </div>
         )}
         <span className="font-medium text-ink">{category.name}</span>
+        {emptyOnHome && (
+          <span
+            title="This category has no active products yet, so its homepage row won't show up until you tag one."
+            className="flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700"
+          >
+            <AlertTriangle className="h-3 w-3" /> No products yet
+          </span>
+        )}
       </div>
 
       <div className="flex items-center gap-1">
