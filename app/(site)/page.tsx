@@ -10,6 +10,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { ButtonLink } from "@/components/ui/ButtonLink";
+import { HeroVideo } from "@/components/HeroVideo";
 import { ProductCard } from "@/components/products/ProductCard";
 import { HorizontalProductRow } from "@/components/products/HorizontalProductRow";
 import { ReelsRow } from "@/components/ReelsRow";
@@ -38,7 +39,11 @@ export default async function HomePage() {
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-border-soft/70">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-amber/20 via-blush/15 to-cream" />
+        <div className="absolute inset-0 -z-20 bg-gradient-to-b from-amber/20 via-blush/15 to-cream" />
+        <div className="absolute inset-0 -z-10">
+          <HeroVideo src="/video/hero-pour.mp4" />
+          <div className="absolute inset-0 bg-gradient-to-b from-white/55 via-white/70 to-cream" />
+        </div>
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-4 py-20 text-center sm:px-6 sm:py-28">
           <span className="animate-fade-in-up inline-flex items-center gap-1.5 rounded-full border border-amber/30 bg-white/70 px-4 py-1.5 text-xs font-medium tracking-wide text-amber-dark">
             <Sparkles className="h-3.5 w-3.5" /> Handmade in small batches

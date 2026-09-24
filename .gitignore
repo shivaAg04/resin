@@ -39,6 +39,9 @@ yarn-error.log*
 # supabase
 supabase/.temp/
 
+# local scratch assets (source files copied into public/ as needed)
+/assets/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
