@@ -49,6 +49,16 @@ export type ProductInput = {
   images: string[];
 };
 
+export interface Reel {
+  id: string;
+  url: string;
+  caption: string | null;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Order {
   id: string;
   order_number: string;

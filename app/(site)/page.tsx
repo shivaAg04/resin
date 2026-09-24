@@ -12,8 +12,10 @@ import {
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { ProductCard } from "@/components/products/ProductCard";
 import { HorizontalProductRow } from "@/components/products/HorizontalProductRow";
+import { ReelsRow } from "@/components/ReelsRow";
 import { getFeaturedProducts, getProductsByCategoryForHome } from "@/lib/data/products";
 import { getHomeCategories } from "@/lib/data/categories";
+import { getActiveReels } from "@/lib/data/reels";
 import { buildGenericWhatsAppUrl } from "@/lib/whatsapp";
 
 export default async function HomePage() {
@@ -28,6 +30,7 @@ export default async function HomePage() {
   // No homepage categories configured yet (fresh install) — fall back to a
   // simple "recently added" section so the homepage is never empty.
   const featuredProducts = homeCategories.length === 0 ? await getFeaturedProducts(4) : [];
+  const reels = await getActiveReels();
   const instagramUrl = process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? "#";
   const whatsappUrl = buildGenericWhatsAppUrl();
 
@@ -160,6 +163,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Reels — added/reordered from /admin/reels */}
+      <ReelsRow reels={reels} />
 
       {/* Instagram */}
       <section className="mx-auto max-w-6xl px-4 py-16 text-center sm:px-6 sm:py-24">
