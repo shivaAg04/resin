@@ -1,23 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#f2e6d6"/>
-      <stop offset="100%" stop-color="#e8c9a8"/>
+      <stop offset="0%" stop-color="#ffddd2"/>
+      <stop offset="100%" stop-color="#ffb9b9"/>
     </linearGradient>
     <linearGradient id="drop" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#c98a4b" stop-opacity="0.9"/>
-      <stop offset="55%" stop-color="#b5652f" stop-opacity="0.85"/>
-      <stop offset="100%" stop-color="#7a4420" stop-opacity="0.9"/>
+      <stop offset="0%" stop-color="#ffacc7" stop-opacity="0.95"/>
+      <stop offset="55%" stop-color="#ff8dc7" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#a55698" stop-opacity="0.95"/>
     </linearGradient>
     <radialGradient id="shine" cx="35%" cy="30%" r="60%">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6"/>
       <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
     </radialGradient>
   </defs>
   <rect width="600" height="600" fill="url(#bg)"/>
   <path d="M300 130 C 400 130 460 220 445 320 C 432 405 370 470 300 470 C 230 470 168 405 155 320 C 140 220 200 130 300 130 Z" fill="url(#drop)"/>
   <path d="M300 130 C 400 130 460 220 445 320 C 432 405 370 470 300 470 C 230 470 168 405 155 320 C 140 220 200 130 300 130 Z" fill="url(#shine)"/>
-  <circle cx="230" cy="245" r="10" fill="#fce8d2" opacity="0.7"/>
-  <circle cx="360" cy="300" r="6" fill="#fce8d2" opacity="0.6"/>
-  <circle cx="300" cy="380" r="8" fill="#fce8d2" opacity="0.5"/>
+  <circle cx="230" cy="245" r="10" fill="#fff5f8" opacity="0.75"/>
+  <circle cx="360" cy="300" r="6" fill="#fff5f8" opacity="0.65"/>
+  <circle cx="300" cy="380" r="8" fill="#fff5f8" opacity="0.55"/>
 </svg>
