@@ -38,7 +38,13 @@ function warnMockDataFallback(error: unknown): boolean {
 }
 
 /** Public: active products only (RLS enforces this for anon, this is belt-and-braces). */
-export async function getActiveProducts(options?: { categorySlug?: string }): Promise<Product[]> {
+export async function getActiveProducts(options?: { categorySlug?: string; search?: string }): Promise<Product[]> {
+  const search = options?.search?.trim();
+
+  if (search) {
+    return searchActiveProducts(search, options?.categorySlug);
+  }
+
   try {
     const supabase = await createClient();
 
@@ -64,6 +70,73 @@ export async function getActiveProducts(options?: { categorySlug?: string }): Pr
     return MOCK_PRODUCTS.filter(
       (p) => !options?.categorySlug || p.categories.some((c) => c.slug === options.categorySlug),
     );
+  }
+}
+
+/**
+ * Searches active products by category name and title. Results are ordered
+ * category-match first, then title-match, per each group's normal display
+ * order — so searching "Diwali" surfaces the whole Diwali category ahead of
+ * a single product that merely has "Diwali" in its name.
+ */
+async function searchActiveProducts(query: string, categorySlug?: string): Promise<Product[]> {
+  const term = `%${query}%`;
+
+  try {
+    const supabase = await createClient();
+
+    if (categorySlug) {
+      // Already scoped to one category — no category-vs-title priority to resolve.
+      const { data, error } = await supabase
+        .from("products")
+        .select("*, product_categories!inner(categories!inner(*))")
+        .eq("is_active", true)
+        .eq("product_categories.categories.slug", categorySlug)
+        .ilike("name", term)
+        .order("sort_order", { ascending: true });
+
+      if (error) throw error;
+      return (data as Record<string, unknown>[]).map(mapProductRow);
+    }
+
+    const [byCategory, byTitle] = await Promise.all([
+      supabase
+        .from("products")
+        .select("*, product_categories!inner(categories!inner(*))")
+        .eq("is_active", true)
+        .ilike("product_categories.categories.name", term)
+        .order("sort_order", { ascending: true }),
+      supabase
+        .from("products")
+        .select(PRODUCT_WITH_CATEGORIES_SELECT)
+        .eq("is_active", true)
+        .ilike("name", term)
+        .order("sort_order", { ascending: true }),
+    ]);
+
+    if (byCategory.error) throw byCategory.error;
+    if (byTitle.error) throw byTitle.error;
+
+    const seen = new Set<string>();
+    const results: Product[] = [];
+    for (const row of [...(byCategory.data ?? []), ...(byTitle.data ?? [])]) {
+      const product = mapProductRow(row as Record<string, unknown>);
+      if (seen.has(product.id)) continue;
+      seen.add(product.id);
+      results.push(product);
+    }
+    return results;
+  } catch (error) {
+    warnMockDataFallback(error);
+    const lower = query.toLowerCase();
+    const inCategory = (p: Product) => p.categories.some((c) => c.name.toLowerCase().includes(lower));
+    const inTitle = (p: Product) => p.name.toLowerCase().includes(lower);
+    const pool = MOCK_PRODUCTS.filter(
+      (p) => !categorySlug || p.categories.some((c) => c.slug === categorySlug),
+    );
+    const byCategory = pool.filter(inCategory);
+    const byTitle = pool.filter((p) => inTitle(p) && !inCategory(p));
+    return [...byCategory, ...byTitle];
   }
 }
 
