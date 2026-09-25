@@ -1,5 +1,41 @@
 import { createClient } from "@/lib/supabase/server";
-import type { ProductReview } from "@/types";
+import type { Product, ProductReview } from "@/types";
+
+/**
+ * Reviews to show on a product's page. For a bundle, this pools in reviews
+ * left on any of its component products too — but the bundle's own
+ * reviews (if it has any) are always first/prioritized, and duplicates
+ * are dropped.
+ */
+export async function getReviewsForProductPage(product: Product): Promise<ProductReview[]> {
+  const ownReviews = await getActiveReviewsForProduct(product.id);
+  if (product.bundle_items.length === 0) return ownReviews;
+
+  try {
+    const supabase = await createClient();
+    const componentIds = product.bundle_items.map((item) => item.product_id);
+    const { data, error } = await supabase
+      .from("product_reviews")
+      .select("*")
+      .in("product_id", componentIds)
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true });
+
+    if (error) throw error;
+
+    const seen = new Set<string>();
+    const combined: ProductReview[] = [];
+    for (const review of [...ownReviews, ...(data as ProductReview[])]) {
+      if (seen.has(review.id)) continue;
+      seen.add(review.id);
+      combined.push(review);
+    }
+    return combined;
+  } catch (error) {
+    console.error("getReviewsForProductPage error", error);
+    return ownReviews;
+  }
+}
 
 export async function getActiveReviewsForProduct(productId: string): Promise<ProductReview[]> {
   try {

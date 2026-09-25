@@ -35,7 +35,7 @@ export async function getBundleItemsForProduct(productId: string): Promise<Bundl
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("product_bundle_items")
-      .select("quantity, item:item_product_id(id, name, slug, price, images)")
+      .select("quantity, item:item_product_id(id, name, slug, price, images, reel_url)")
       .eq("bundle_product_id", productId)
       .order("sort_order", { ascending: true });
 
@@ -50,6 +50,7 @@ export async function getBundleItemsForProduct(productId: string): Promise<Bundl
         price: row.item.price,
         images: row.item.images,
         quantity: row.quantity,
+        reel_url: row.item.reel_url,
       }));
   } catch (error) {
     console.error("getBundleItemsForProduct error", error);
@@ -416,9 +417,34 @@ async function syncProductBundleItems(
   }
 }
 
+/**
+ * A bundle's price is never trusted from the client — it's always
+ * recomputed here as sum(current component prices) - discount, so it
+ * can't drift from a stale or manipulated value. Non-bundle products
+ * (no bundleItemIds) keep their manually-entered price as-is.
+ */
+async function resolveProductPrice(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  input: ProductInput,
+): Promise<number> {
+  const itemIds = input.bundleItemIds ?? [];
+  if (itemIds.length === 0) return input.price;
+
+  const { data, error } = await supabase.from("products").select("price").in("id", itemIds);
+  if (error || !data) {
+    console.error("resolveProductPrice error", error);
+    return input.price;
+  }
+
+  const subtotal = data.reduce((sum, row) => sum + Number(row.price), 0);
+  const discount = Math.max(0, input.discountAmount ?? 0);
+  return Math.max(0, Math.round((subtotal - discount) * 100) / 100);
+}
+
 export async function createProduct(input: ProductInput): Promise<{ product?: Product; error?: string }> {
   const supabase = await createClient();
   const slug = await uniqueSlug(supabase, input.slug || input.name);
+  const price = await resolveProductPrice(supabase, input);
 
   const { data, error } = await supabase
     .from("products")
@@ -426,7 +452,8 @@ export async function createProduct(input: ProductInput): Promise<{ product?: Pr
       name: input.name,
       slug,
       description: input.description.trim() || null,
-      price: input.price,
+      price,
+      discount_amount: (input.bundleItemIds?.length ?? 0) > 0 ? Math.max(0, input.discountAmount ?? 0) : 0,
       is_active: input.is_active,
       images: input.images,
       reel_url: input.reelUrl ? normalizeReelUrl(input.reelUrl) : null,
@@ -467,13 +494,16 @@ export async function updateProduct(
     slug = await uniqueSlug(supabase, input.slug, id);
   }
 
+  const price = await resolveProductPrice(supabase, input);
+
   const { data, error } = await supabase
     .from("products")
     .update({
       name: input.name,
       slug,
       description: input.description.trim() || null,
-      price: input.price,
+      price,
+      discount_amount: (input.bundleItemIds?.length ?? 0) > 0 ? Math.max(0, input.discountAmount ?? 0) : 0,
       is_active: input.is_active,
       images: input.images,
       reel_url: input.reelUrl ? normalizeReelUrl(input.reelUrl) : null,
@@ -526,4 +556,33 @@ export async function getProductForOrder(slug: string) {
     return null;
   }
   return data as Omit<Product, "categories"> | null;
+}
+
+export interface DisplayReel {
+  url: string;
+  caption: string | null;
+}
+
+/**
+ * Reels to show on a product's page. For a bundle, this pools in every
+ * component's Reel too — but the bundle's own Reel (if it has one) is
+ * always first/prioritized, and duplicate URLs are dropped.
+ */
+export function getDisplayReelsForProduct(product: Product): DisplayReel[] {
+  const reels: DisplayReel[] = [];
+  const seen = new Set<string>();
+
+  if (product.reel_url) {
+    reels.push({ url: product.reel_url, caption: product.name });
+    seen.add(product.reel_url);
+  }
+
+  for (const item of product.bundle_items) {
+    if (item.reel_url && !seen.has(item.reel_url)) {
+      reels.push({ url: item.reel_url, caption: item.name });
+      seen.add(item.reel_url);
+    }
+  }
+
+  return reels;
 }

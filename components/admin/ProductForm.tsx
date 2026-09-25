@@ -8,6 +8,7 @@ import { ImageUploader } from "@/components/admin/ImageUploader";
 import { CategoryTagPicker } from "@/components/admin/CategoryTagPicker";
 import { BundleItemsPicker, type PickableProduct } from "@/components/admin/BundleItemsPicker";
 import { createProductAction, updateProductAction } from "@/app/admin/(protected)/products/actions";
+import { formatPrice } from "@/lib/utils/format";
 import type { Category, Product, ProductInput } from "@/types";
 
 export function ProductForm({
@@ -29,8 +30,18 @@ export function ProductForm({
   const [images, setImages] = useState<string[]>(product?.images ?? []);
   const [reelUrl, setReelUrl] = useState(product?.reel_url ?? "");
   const [bundleItemIds, setBundleItemIds] = useState<string[]>(product?.bundle_items.map((b) => b.product_id) ?? []);
+  const [discountAmount, setDiscountAmount] = useState(product?.discount_amount ? String(product.discount_amount) : "0");
 
   const pickableProducts = allProducts.filter((p) => p.id !== product?.id);
+  const isBundle = bundleItemIds.length > 0;
+  const bundleSubtotal = pickableProducts
+    .filter((p) => bundleItemIds.includes(p.id))
+    // Supabase returns numeric columns as strings — without Number() this
+    // silently does string concatenation ("0" + "299.00" + ...) instead of
+    // addition, which is exactly why the live total looked broken.
+    .reduce((sum, p) => sum + Number(p.price), 0);
+  const discountValue = Math.max(0, Number(discountAmount) || 0);
+  const bundlePrice = Math.max(0, bundleSubtotal - discountValue);
 
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -39,10 +50,10 @@ export function ProductForm({
     event.preventDefault();
     setError(null);
 
-    const priceValue = Number(price);
+    const priceValue = isBundle ? bundlePrice : Number(price);
 
     if (!name.trim()) return setError("Product name is required.");
-    if (!Number.isFinite(priceValue) || priceValue < 0) return setError("Enter a valid price.");
+    if (!isBundle && (!Number.isFinite(priceValue) || priceValue < 0)) return setError("Enter a valid price.");
 
     const input: ProductInput = {
       name: name.trim(),
@@ -53,6 +64,7 @@ export function ProductForm({
       images,
       reelUrl: reelUrl.trim(),
       bundleItemIds,
+      discountAmount: discountValue,
     };
 
     setSubmitting(true);
@@ -74,16 +86,27 @@ export function ProductForm({
       </FieldWrapper>
 
       <FieldWrapper label="Price (₹)" htmlFor="price">
-        <Input
-          id="price"
-          type="number"
-          min={0}
-          step="0.01"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          required
-          className="max-w-40"
-        />
+        {isBundle ? (
+          <div>
+            <div className="flex h-11 w-40 items-center rounded-xl border border-ink/10 bg-ink/5 px-4 text-sm text-ink-soft">
+              {formatPrice(bundlePrice)}
+            </div>
+            <p className="mt-1 text-xs text-ink-soft">
+              Auto-calculated from the bundle items and discount below.
+            </p>
+          </div>
+        ) : (
+          <Input
+            id="price"
+            type="number"
+            min={0}
+            step="0.01"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            required
+            className="max-w-40"
+          />
+        )}
       </FieldWrapper>
 
       <FieldWrapper label="Categories" htmlFor="categories" optional>
@@ -105,12 +128,30 @@ export function ProductForm({
 
       <FieldWrapper label="Bundle Items" htmlFor="bundleItems" optional>
         <p className="mb-2 text-xs text-ink-soft">
-          Selling this as a combo of other products? Pick what&apos;s included — shown on this
-          product&apos;s page. This product still has its own price above; picking items here doesn&apos;t
-          change their price or stock.
+          Selling this as a combo of other products? Pick what&apos;s included — the price above
+          switches to auto-calculated (sum of these items, minus the discount below) and this combo
+          shows up under whatever categories you pick, same as any product.
         </p>
         <BundleItemsPicker products={pickableProducts} selectedIds={bundleItemIds} onChange={setBundleItemIds} />
       </FieldWrapper>
+
+      {isBundle && (
+        <FieldWrapper label="Discount (₹)" htmlFor="discountAmount">
+          <Input
+            id="discountAmount"
+            type="number"
+            min={0}
+            step="0.01"
+            value={discountAmount}
+            onChange={(e) => setDiscountAmount(e.target.value)}
+            className="max-w-40"
+          />
+          <p className="mt-1 text-xs text-ink-soft">
+            Bundle subtotal {formatPrice(bundleSubtotal)} − discount {formatPrice(discountValue)} ={" "}
+            <span className="font-medium text-ink">{formatPrice(bundlePrice)}</span>
+          </p>
+        </FieldWrapper>
+      )}
 
       <FieldWrapper label="Instagram Reel Link" htmlFor="reelUrl" optional>
         <Input

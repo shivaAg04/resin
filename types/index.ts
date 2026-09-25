@@ -33,6 +33,7 @@ export interface BundleItem {
   price: number;
   images: string[];
   quantity: number;
+  reel_url: string | null;
 }
 
 export interface Product {
@@ -42,6 +43,7 @@ export interface Product {
   slug: string;
   description: string | null;
   price: number;
+  discount_amount: number;
   is_active: boolean;
   images: string[];
   categories: Category[];
@@ -62,6 +64,7 @@ export type ProductInput = {
   images: string[];
   reelUrl?: string;
   bundleItemIds?: string[];
+  discountAmount?: number;
 };
 
 export interface Reel {

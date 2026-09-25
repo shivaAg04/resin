@@ -8,8 +8,8 @@ import { ProductImage } from "@/components/products/ProductImage";
 import { ReviewsCarousel } from "@/components/products/ReviewsCarousel";
 import { InstagramEmbed, processInstagramEmbeds } from "@/components/InstagramEmbed";
 import { Badge } from "@/components/ui/Badge";
-import { getProductBySlug } from "@/lib/data/products";
-import { getActiveReviewsForProduct } from "@/lib/data/reviews";
+import { getDisplayReelsForProduct, getProductBySlug } from "@/lib/data/products";
+import { getReviewsForProductPage } from "@/lib/data/reviews";
 import { formatPrice } from "@/lib/utils/format";
 
 export async function generateMetadata(props: PageProps<"/products/[slug]">): Promise<Metadata> {
@@ -35,7 +35,14 @@ export default async function ProductDetailPage(props: PageProps<"/products/[slu
 
   if (!product) notFound();
 
-  const reviews = await getActiveReviewsForProduct(product.id);
+  const reviews = await getReviewsForProductPage(product);
+  const reels = getDisplayReelsForProduct(product);
+
+  const bundleSubtotal = product.bundle_items.reduce(
+    (sum, item) => sum + Number(item.price) * item.quantity,
+    0,
+  );
+  const bundleSavings = product.bundle_items.length > 0 ? Math.max(0, bundleSubtotal - Number(product.price)) : 0;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
@@ -52,7 +59,17 @@ export default async function ProductDetailPage(props: PageProps<"/products/[slu
           )}
 
           <h1 className="font-display text-3xl font-semibold text-ink sm:text-4xl">{product.name}</h1>
-          <p className="font-display text-2xl font-medium text-amber-dark">{formatPrice(product.price)}</p>
+          <div className="flex flex-wrap items-baseline gap-2">
+            <p className="font-display text-2xl font-medium text-amber-dark">{formatPrice(product.price)}</p>
+            {bundleSavings > 0 && (
+              <>
+                <span className="text-base text-ink-soft/60 line-through">{formatPrice(bundleSubtotal)}</span>
+                <Badge className="border-green-200 bg-green-50 text-green-700">
+                  Save {formatPrice(bundleSavings)}
+                </Badge>
+              </>
+            )}
+          </div>
 
           {product.description && (
             <p className="text-base leading-relaxed text-ink-soft">{product.description}</p>
@@ -86,13 +103,23 @@ export default async function ProductDetailPage(props: PageProps<"/products/[slu
             </div>
           )}
 
-          {product.reel_url && (
+          {reels.length > 0 && (
             <div className="border-t border-border-soft/70 pt-6">
               <Script src="https://www.instagram.com/embed.js" strategy="lazyOnload" onLoad={processInstagramEmbeds} />
               <h2 className="mb-3 font-display text-lg font-semibold text-ink">See it in action</h2>
-              <div className="max-w-sm">
-                <InstagramEmbed url={product.reel_url} caption={product.name} />
-              </div>
+              {reels.length === 1 ? (
+                <div className="max-w-sm">
+                  <InstagramEmbed url={reels[0].url} caption={reels[0].caption} />
+                </div>
+              ) : (
+                <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
+                  {reels.map((reel) => (
+                    <div key={reel.url} className="w-[260px] shrink-0 snap-start">
+                      <InstagramEmbed url={reel.url} caption={reel.caption} />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
