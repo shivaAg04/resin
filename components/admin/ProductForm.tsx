@@ -6,10 +6,19 @@ import { Button } from "@/components/ui/Button";
 import { FieldWrapper, Input, Select, Textarea } from "@/components/ui/Field";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import { CategoryTagPicker } from "@/components/admin/CategoryTagPicker";
+import { BundleItemsPicker, type PickableProduct } from "@/components/admin/BundleItemsPicker";
 import { createProductAction, updateProductAction } from "@/app/admin/(protected)/products/actions";
 import type { Category, Product, ProductInput } from "@/types";
 
-export function ProductForm({ product, categories }: { product?: Product; categories: Category[] }) {
+export function ProductForm({
+  product,
+  categories,
+  allProducts,
+}: {
+  product?: Product;
+  categories: Category[];
+  allProducts: PickableProduct[];
+}) {
   const isEditing = Boolean(product);
 
   const [name, setName] = useState(product?.name ?? "");
@@ -18,6 +27,10 @@ export function ProductForm({ product, categories }: { product?: Product; catego
   const [categoryIds, setCategoryIds] = useState<string[]>(product?.categories.map((c) => c.id) ?? []);
   const [isActive, setIsActive] = useState(product?.is_active ?? true);
   const [images, setImages] = useState<string[]>(product?.images ?? []);
+  const [reelUrl, setReelUrl] = useState(product?.reel_url ?? "");
+  const [bundleItemIds, setBundleItemIds] = useState<string[]>(product?.bundle_items.map((b) => b.product_id) ?? []);
+
+  const pickableProducts = allProducts.filter((p) => p.id !== product?.id);
 
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -38,6 +51,8 @@ export function ProductForm({ product, categories }: { product?: Product; catego
       categoryIds,
       is_active: isActive,
       images,
+      reelUrl: reelUrl.trim(),
+      bundleItemIds,
     };
 
     setSubmitting(true);
@@ -86,6 +101,25 @@ export function ProductForm({ product, categories }: { product?: Product; catego
 
       <FieldWrapper label="Product Images" htmlFor="images">
         <ImageUploader images={images} onChange={setImages} />
+      </FieldWrapper>
+
+      <FieldWrapper label="Bundle Items" htmlFor="bundleItems" optional>
+        <p className="mb-2 text-xs text-ink-soft">
+          Selling this as a combo of other products? Pick what&apos;s included — shown on this
+          product&apos;s page. This product still has its own price above; picking items here doesn&apos;t
+          change their price or stock.
+        </p>
+        <BundleItemsPicker products={pickableProducts} selectedIds={bundleItemIds} onChange={setBundleItemIds} />
+      </FieldWrapper>
+
+      <FieldWrapper label="Instagram Reel Link" htmlFor="reelUrl" optional>
+        <Input
+          id="reelUrl"
+          type="url"
+          placeholder="https://www.instagram.com/reel/..."
+          value={reelUrl}
+          onChange={(e) => setReelUrl(e.target.value)}
+        />
       </FieldWrapper>
 
       <FieldWrapper label="Status" htmlFor="isActive">

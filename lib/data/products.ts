@@ -1,7 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MOCK_PRODUCTS } from "@/lib/data/mock-products";
-import type { Category, Product, ProductInput } from "@/types";
+import { normalizeReelUrl } from "@/lib/utils/instagram";
+import type { BundleItem, Category, Product, ProductInput } from "@/types";
 
 const PRODUCT_WITH_CATEGORIES_SELECT = "*, product_categories(categories(*))";
 
@@ -20,9 +21,40 @@ function mapProductRow(row: Record<string, unknown>): Product {
   } & Record<string, unknown>;
 
   return {
-    ...(rest as Omit<Product, "categories">),
+    ...(rest as Omit<Product, "categories" | "bundle_items">),
     categories: (product_categories ?? []).map((pc) => pc.categories).filter((c): c is Category => Boolean(c)),
+    // Only populated for single-product fetches (getProductBySlug /
+    // getProductByIdAdmin) — listing queries don't need this extra join.
+    bundle_items: [],
   };
+}
+
+/** The other products a bundle product is made up of, for its detail page / edit form. */
+export async function getBundleItemsForProduct(productId: string): Promise<BundleItem[]> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("product_bundle_items")
+      .select("quantity, item:item_product_id(id, name, slug, price, images)")
+      .eq("bundle_product_id", productId)
+      .order("sort_order", { ascending: true });
+
+    if (error) throw error;
+
+    return (data as unknown as { quantity: number; item: Omit<BundleItem, "product_id" | "quantity"> & { id: string } }[])
+      .filter((row) => row.item)
+      .map((row) => ({
+        product_id: row.item.id,
+        name: row.item.name,
+        slug: row.item.slug,
+        price: row.item.price,
+        images: row.item.images,
+        quantity: row.quantity,
+      }));
+  } catch (error) {
+    console.error("getBundleItemsForProduct error", error);
+    return [];
+  }
 }
 
 /**
@@ -222,7 +254,11 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
       .maybeSingle();
 
     if (error) throw error;
-    if (data) return mapProductRow(data as Record<string, unknown>);
+    if (data) {
+      const product = mapProductRow(data as Record<string, unknown>);
+      product.bundle_items = await getBundleItemsForProduct(product.id);
+      return product;
+    }
     // A real, connected Supabase project simply has no such product — don't
     // mask that with demo data.
     return null;
@@ -309,7 +345,11 @@ export async function getProductByIdAdmin(id: string): Promise<Product | null> {
     console.error("getProductByIdAdmin error", error);
     return null;
   }
-  return data ? mapProductRow(data as Record<string, unknown>) : null;
+  if (!data) return null;
+
+  const product = mapProductRow(data as Record<string, unknown>);
+  product.bundle_items = await getBundleItemsForProduct(product.id);
+  return product;
 }
 
 async function uniqueSlug(supabase: Awaited<ReturnType<typeof createClient>>, base: string, excludeId?: string) {
@@ -347,6 +387,35 @@ async function syncProductCategories(
   }
 }
 
+/** Replaces a bundle product's component-item list with exactly the given set. */
+async function syncProductBundleItems(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  bundleProductId: string,
+  itemProductIds: string[],
+) {
+  const { error: deleteError } = await supabase
+    .from("product_bundle_items")
+    .delete()
+    .eq("bundle_product_id", bundleProductId);
+  if (deleteError) {
+    console.error("syncProductBundleItems delete error", deleteError);
+    return;
+  }
+  const ids = itemProductIds.filter((id) => id !== bundleProductId);
+  if (ids.length === 0) return;
+
+  const { error: insertError } = await supabase.from("product_bundle_items").insert(
+    ids.map((itemProductId, index) => ({
+      bundle_product_id: bundleProductId,
+      item_product_id: itemProductId,
+      sort_order: index,
+    })),
+  );
+  if (insertError) {
+    console.error("syncProductBundleItems insert error", insertError);
+  }
+}
+
 export async function createProduct(input: ProductInput): Promise<{ product?: Product; error?: string }> {
   const supabase = await createClient();
   const slug = await uniqueSlug(supabase, input.slug || input.name);
@@ -360,6 +429,7 @@ export async function createProduct(input: ProductInput): Promise<{ product?: Pr
       price: input.price,
       is_active: input.is_active,
       images: input.images,
+      reel_url: input.reelUrl ? normalizeReelUrl(input.reelUrl) : null,
     })
     .select("*")
     .single();
@@ -370,6 +440,7 @@ export async function createProduct(input: ProductInput): Promise<{ product?: Pr
   }
 
   await syncProductCategories(supabase, data.id, input.categoryIds);
+  await syncProductBundleItems(supabase, data.id, input.bundleItemIds ?? []);
   const product = await getProductByIdAdmin(data.id);
   return { product: product ?? undefined };
 }
@@ -379,7 +450,22 @@ export async function updateProduct(
   input: ProductInput,
 ): Promise<{ product?: Product; error?: string }> {
   const supabase = await createClient();
-  const slug = await uniqueSlug(supabase, input.slug || input.name, id);
+
+  // The URL slug stays stable across renames — regenerating it from a new
+  // name would silently break any link already shared (Instagram bio,
+  // WhatsApp, the Reel embed, etc). Only recompute it if a slug is
+  // explicitly provided (not currently exposed in the admin UI) or the
+  // product somehow has none yet.
+  let slug = input.slug;
+  if (!slug) {
+    const { data: current } = await supabase.from("products").select("slug").eq("id", id).maybeSingle();
+    slug = current?.slug || undefined;
+  }
+  if (!slug) {
+    slug = await uniqueSlug(supabase, input.name, id);
+  } else if (input.slug) {
+    slug = await uniqueSlug(supabase, input.slug, id);
+  }
 
   const { data, error } = await supabase
     .from("products")
@@ -390,6 +476,7 @@ export async function updateProduct(
       price: input.price,
       is_active: input.is_active,
       images: input.images,
+      reel_url: input.reelUrl ? normalizeReelUrl(input.reelUrl) : null,
     })
     .eq("id", id)
     .select("*")
@@ -401,6 +488,7 @@ export async function updateProduct(
   }
 
   await syncProductCategories(supabase, id, input.categoryIds);
+  await syncProductBundleItems(supabase, id, input.bundleItemIds ?? []);
   const product = await getProductByIdAdmin(data.id);
   return { product: product ?? undefined };
 }

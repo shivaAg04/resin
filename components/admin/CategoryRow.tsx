@@ -122,6 +122,7 @@ export function CategoryRow({
             </div>
           </div>
         )}
+        <span className="font-mono text-xs text-ink-soft/70">{category.code}</span>
         <span className="font-medium text-ink">{category.name}</span>
         {emptyOnHome && (
           <span

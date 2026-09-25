@@ -9,17 +9,18 @@ import type { Category, Product } from "@/types";
  */
 const now = new Date().toISOString();
 
-function category(id: string, name: string, slug: string, homePosition: number): Category {
-  return { id, name, slug, show_on_home: true, home_position: homePosition, created_at: now, updated_at: now };
+function category(id: string, code: string, name: string, slug: string, homePosition: number): Category {
+  return { id, code, name, slug, show_on_home: true, home_position: homePosition, created_at: now, updated_at: now };
 }
 
-const RODCUTS = category("c0000000-0000-0000-0000-000000000001", "Rodcuts", "rodcuts", 0);
-const CUSTOM = category("c0000000-0000-0000-0000-000000000002", "Custom", "custom", 1);
-const PREMIUM = category("c0000000-0000-0000-0000-000000000003", "Premium", "premium", 2);
+const RODCUTS = category("c0000000-0000-0000-0000-000000000001", "C001", "Rodcuts", "rodcuts", 0);
+const CUSTOM = category("c0000000-0000-0000-0000-000000000002", "C002", "Custom", "custom", 1);
+const PREMIUM = category("c0000000-0000-0000-0000-000000000003", "C003", "Premium", "premium", 2);
 
 export const MOCK_PRODUCTS: Product[] = [
   {
     id: "00000000-0000-0000-0000-000000000001",
+    code: "P001",
     name: "Resin Rodcut Classic",
     slug: "resin-rodcut-classic",
     description:
@@ -29,11 +30,14 @@ export const MOCK_PRODUCTS: Product[] = [
     is_active: true,
     images: [],
     sort_order: 0,
+    reel_url: null,
+    bundle_items: [],
     created_at: now,
     updated_at: now,
   },
   {
     id: "00000000-0000-0000-0000-000000000002",
+    code: "P002",
     name: "Ocean Blue Resin Rodcut",
     slug: "ocean-blue-resin-rodcut",
     description:
@@ -43,11 +47,14 @@ export const MOCK_PRODUCTS: Product[] = [
     is_active: true,
     images: [],
     sort_order: 1,
+    reel_url: null,
+    bundle_items: [],
     created_at: now,
     updated_at: now,
   },
   {
     id: "00000000-0000-0000-0000-000000000003",
+    code: "P003",
     name: "Floral Resin Rodcut",
     slug: "floral-resin-rodcut",
     description: "Real dried flowers suspended in crystal-clear resin — a delicate, nature-inspired keepsake.",
@@ -56,11 +63,14 @@ export const MOCK_PRODUCTS: Product[] = [
     is_active: true,
     images: [],
     sort_order: 2,
+    reel_url: null,
+    bundle_items: [],
     created_at: now,
     updated_at: now,
   },
   {
     id: "00000000-0000-0000-0000-000000000004",
+    code: "P004",
     name: "Custom Name Resin Rodcut",
     slug: "custom-name-resin-rodcut",
     description: "Personalize this rodcut with any name or short text, hand-finished in resin. Perfect as a gift.",
@@ -69,11 +79,14 @@ export const MOCK_PRODUCTS: Product[] = [
     is_active: true,
     images: [],
     sort_order: 3,
+    reel_url: null,
+    bundle_items: [],
     created_at: now,
     updated_at: now,
   },
   {
     id: "00000000-0000-0000-0000-000000000005",
+    code: "P005",
     name: "Premium Resin Rodcut",
     slug: "premium-resin-rodcut",
     description:
@@ -83,6 +96,8 @@ export const MOCK_PRODUCTS: Product[] = [
     is_active: true,
     images: [],
     sort_order: 4,
+    reel_url: null,
+    bundle_items: [],
     created_at: now,
     updated_at: now,
   },

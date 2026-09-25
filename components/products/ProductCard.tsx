@@ -10,8 +10,8 @@ export function ProductCard({ product }: { product: Product }) {
   const primaryCategory = product.categories[0];
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-ink/[0.06] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-ink/10">
-      <Link href={`/products/${product.slug}`} className="relative block">
+    <div className="group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-ink/[0.06] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-ink/10">
+      <div className="relative">
         <ProductImage
           src={product.images?.[0]}
           alt={product.name}
@@ -22,14 +22,12 @@ export function ProductCard({ product }: { product: Product }) {
             {primaryCategory.name}
           </Badge>
         )}
-      </Link>
+      </div>
 
       <div className="flex flex-1 flex-col gap-1 p-5">
-        <Link href={`/products/${product.slug}`}>
-          <h3 className="line-clamp-1 font-display text-lg leading-tight text-ink transition-colors group-hover:text-amber-dark">
-            {product.name}
-          </h3>
-        </Link>
+        <h3 className="line-clamp-1 font-display text-lg leading-tight text-ink transition-colors group-hover:text-amber-dark">
+          {product.name}
+        </h3>
 
         <span className="font-display text-xl font-medium text-amber-dark">
           {formatPrice(product.price)}
@@ -39,23 +37,23 @@ export function ProductCard({ product }: { product: Product }) {
           <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-ink-soft">{product.description}</p>
         )}
 
-        <div className="mt-4 flex items-center gap-3">
-          <Link
-            href={`/products/${product.slug}`}
-            className="-my-2 inline-block py-2 text-sm font-medium text-ink-soft underline-offset-4 transition-colors hover:text-ink hover:underline"
-          >
-            View Details
-          </Link>
+        <div className="mt-4">
           <ButtonLink
             href={`/checkout?product=${product.slug}&quantity=1`}
             variant="primary"
             size="sm"
-            className="ml-auto"
+            className="relative z-10 w-full"
           >
             Buy Now <ArrowRight className="h-3.5 w-3.5" />
           </ButtonLink>
         </div>
       </div>
+
+      {/* Stretched link — makes the whole card clickable to the product page,
+          while Buy Now (relative z-10 above) stays independently clickable. */}
+      <Link href={`/products/${product.slug}`} aria-label={product.name} className="absolute inset-0 z-0">
+        <span className="sr-only">View {product.name}</span>
+      </Link>
     </div>
   );
 }

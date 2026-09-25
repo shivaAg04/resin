@@ -5,6 +5,7 @@ import { ProductImage } from "@/components/products/ProductImage";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Badge } from "@/components/ui/Badge";
 import { SortWeightInput } from "@/components/admin/SortWeightInput";
+import { AdminSearchBar } from "@/components/admin/AdminSearchBar";
 import { getAllProductsAdmin } from "@/lib/data/products";
 import { formatPrice } from "@/lib/utils/format";
 import { moveProductSortOrderAction, setProductSortOrderAction, toggleProductActiveAction } from "./actions";
@@ -12,16 +13,27 @@ import { DeleteProductButton } from "@/components/admin/DeleteProductButton";
 
 export const metadata: Metadata = { title: "Products" };
 
-export default async function AdminProductsPage() {
-  const products = await getAllProductsAdmin();
+export default async function AdminProductsPage(props: PageProps<"/admin/products">) {
+  const searchParams = await props.searchParams;
+  const search = typeof searchParams.search === "string" ? searchParams.search.trim().toLowerCase() : "";
+
+  const allProducts = await getAllProductsAdmin();
+  const products = search
+    ? allProducts.filter(
+        (p) => p.name.toLowerCase().includes(search) || p.code.toLowerCase().includes(search),
+      )
+    : allProducts;
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="font-display text-2xl font-semibold text-ink">Products</h1>
-        <ButtonLink href="/admin/products/new" size="sm">
-          <Plus className="h-4 w-4" /> Add Product
-        </ButtonLink>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <AdminSearchBar action="/admin/products" defaultValue={search} placeholder="Search by name or code..." />
+          <ButtonLink href="/admin/products/new" size="sm">
+            <Plus className="h-4 w-4" /> Add Product
+          </ButtonLink>
+        </div>
       </div>
       <p className="mt-1 text-sm text-ink-soft">
         Use the arrows to set display order across the storefront and homepage rows.
@@ -29,7 +41,7 @@ export default async function AdminProductsPage() {
 
       {products.length === 0 ? (
         <p className="mt-8 rounded-2xl border border-dashed border-border-soft py-16 text-center text-sm text-ink-soft">
-          No products yet. Add your first one to get started.
+          {search ? `No products match "${search}".` : "No products yet. Add your first one to get started."}
         </p>
       ) : (
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -69,7 +81,10 @@ export default async function AdminProductsPage() {
               </div>
               <div className="p-4">
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-display text-base font-medium text-ink">{product.name}</h3>
+                  <div>
+                    <span className="font-mono text-xs text-ink-soft/70">{product.code}</span>
+                    <h3 className="font-display text-base font-medium text-ink">{product.name}</h3>
+                  </div>
                   <Badge className={product.is_active ? "border-green-200 bg-green-50 text-green-700" : "border-ink/10 bg-ink/5 text-ink-soft"}>
                     {product.is_active ? "Active" : "Inactive"}
                   </Badge>

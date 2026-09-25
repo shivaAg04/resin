@@ -4,7 +4,6 @@ import {
   Droplets,
   Gem,
   MessageCircle,
-  Package,
   PenTool,
   ShieldCheck,
   Sparkles,
@@ -13,10 +12,12 @@ import { ButtonLink } from "@/components/ui/ButtonLink";
 import { HeroVideo } from "@/components/HeroVideo";
 import { ProductCard } from "@/components/products/ProductCard";
 import { HorizontalProductRow } from "@/components/products/HorizontalProductRow";
+import { ReviewsCarousel } from "@/components/products/ReviewsCarousel";
 import { ReelsRow } from "@/components/ReelsRow";
 import { getFeaturedProducts, getProductsByCategoryForHome } from "@/lib/data/products";
 import { getHomeCategories } from "@/lib/data/categories";
 import { getActiveReels } from "@/lib/data/reels";
+import { getActiveTestimonials } from "@/lib/data/testimonials";
 import { buildGenericWhatsAppUrl } from "@/lib/whatsapp";
 
 export default async function HomePage() {
@@ -32,6 +33,7 @@ export default async function HomePage() {
   // simple "recently added" section so the homepage is never empty.
   const featuredProducts = homeCategories.length === 0 ? await getFeaturedProducts(4) : [];
   const reels = await getActiveReels();
+  const testimonials = await getActiveTestimonials();
   const instagramUrl = process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? "#";
   const whatsappUrl = buildGenericWhatsAppUrl();
 
@@ -44,7 +46,7 @@ export default async function HomePage() {
           <HeroVideo src="/video/hero-pour.mp4" />
           <div className="absolute inset-0 bg-gradient-to-b from-white/55 via-white/70 to-cream" />
         </div>
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-4 py-20 text-center sm:px-6 sm:py-28">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-5 px-4 py-14 text-center sm:gap-6 sm:px-6 sm:py-28">
           <span className="animate-fade-in-up inline-flex items-center gap-1.5 rounded-full border border-amber/30 bg-white/70 px-4 py-1.5 text-xs font-medium tracking-wide text-amber-dark">
             <Sparkles className="h-3.5 w-3.5" /> Handmade in small batches
           </span>
@@ -72,23 +74,6 @@ export default async function HomePage() {
               <MessageCircle className="h-4 w-4" /> Order on WhatsApp
             </ButtonLink>
           </div>
-        </div>
-      </section>
-
-      {/* Trust badges */}
-      <section className="border-b border-border-soft/70 bg-white/60">
-        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-4 py-8 sm:grid-cols-4 sm:px-6">
-          {[
-            { icon: PenTool, label: "100% Handmade" },
-            { icon: ShieldCheck, label: "Secure Ordering" },
-            { icon: MessageCircle, label: "WhatsApp Support" },
-            { icon: Package, label: "Ships Pan-India" },
-          ].map(({ icon: Icon, label }) => (
-            <div key={label} className="flex items-center justify-center gap-2 text-center sm:justify-start">
-              <Icon className="h-4 w-4 shrink-0 text-amber-dark" strokeWidth={1.5} />
-              <span className="text-xs font-medium text-ink-soft sm:text-sm">{label}</span>
-            </div>
-          ))}
         </div>
       </section>
 
@@ -171,6 +156,15 @@ export default async function HomePage() {
 
       {/* Reels — added/reordered from /admin/reels */}
       <ReelsRow reels={reels} />
+
+      {/* Testimonials — added from /admin/testimonials */}
+      {testimonials.length > 0 && (
+        <section className="border-t border-border-soft/70 bg-white/60">
+          <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24">
+            <ReviewsCarousel title="What Our Customers Say" reviews={testimonials} />
+          </div>
+        </section>
+      )}
 
       {/* Instagram */}
       <section className="mx-auto max-w-6xl px-4 py-16 text-center sm:px-6 sm:py-24">

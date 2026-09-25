@@ -102,7 +102,12 @@ export async function renameCategory(id: string, name: string): Promise<{ catego
   if (!trimmed) return { error: "Category name is required." };
 
   const supabase = await createClient();
-  const slug = await uniqueSlug(supabase, trimmed, id);
+
+  // Keep the URL slug (and the /products?category= links it's used in)
+  // stable across renames — only assign a new one if this category
+  // somehow doesn't have one yet.
+  const { data: current } = await supabase.from("categories").select("slug").eq("id", id).maybeSingle();
+  const slug = current?.slug || (await uniqueSlug(supabase, trimmed, id));
 
   const { data, error } = await supabase
     .from("categories")

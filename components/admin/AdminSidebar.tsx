@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Clapperboard, LayoutDashboard, Package, Receipt, Sparkles, Tags } from "lucide-react";
+import { Clapperboard, LayoutDashboard, MessageSquareQuote, Package, Receipt, Tags } from "lucide-react";
 import { cn } from "@/lib/utils/format";
 import { LogoutButton } from "@/components/admin/LogoutButton";
 
@@ -11,6 +12,7 @@ const links = [
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/categories", label: "Categories", icon: Tags },
   { href: "/admin/reels", label: "Reels", icon: Clapperboard },
+  { href: "/admin/testimonials", label: "Testimonials", icon: MessageSquareQuote },
   { href: "/admin/orders", label: "Orders", icon: Receipt },
 ];
 
@@ -20,9 +22,9 @@ export function AdminSidebar() {
   return (
     <aside className="flex h-full w-full flex-col justify-between border-r border-border-soft/70 bg-white p-4 sm:w-56">
       <div>
-        <div className="flex items-center gap-2 px-2 py-2 font-display text-lg font-semibold">
-          <Sparkles className="h-5 w-5 text-amber" strokeWidth={1.5} />
-          Admin
+        <div className="flex items-center gap-2 px-2 py-2">
+          <Image src="/logo.png" alt="Spilled Colours" width={158} height={54} className="h-7 w-auto" />
+          <span className="text-xs font-medium uppercase tracking-wide text-ink-soft">Admin</span>
         </div>
         <nav className="mt-4 flex gap-1 sm:flex-col">
           {links.map(({ href, label, icon: Icon }) => {

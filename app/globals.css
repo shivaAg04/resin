@@ -58,3 +58,15 @@ body {
     animation: none;
   }
 }
+
+/* Resin-drop cursor on the storefront (not the admin panel). Form fields
+   keep the normal text cursor so it's still obvious where typing lands. */
+.cursor-resin {
+  cursor: url("/cursor-resin.svg") 16 4, auto;
+}
+
+.cursor-resin input,
+.cursor-resin textarea,
+.cursor-resin select {
+  cursor: auto;
+}
