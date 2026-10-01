@@ -102,6 +102,9 @@ export interface Testimonial {
   updated_at: string;
 }
 
+export type PaymentMethod = "cod" | "online";
+export type PaymentStatus = "pending" | "paid" | "failed";
+
 export interface Order {
   id: string;
   order_number: string;
@@ -115,6 +118,10 @@ export interface Order {
   special_instructions: string | null;
   total_amount: number;
   status: OrderStatus;
+  payment_method: PaymentMethod;
+  payment_status: PaymentStatus;
+  razorpay_order_id: string | null;
+  razorpay_payment_id: string | null;
   created_at: string;
   updated_at: string;
 }

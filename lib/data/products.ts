@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MOCK_PRODUCTS } from "@/lib/data/mock-products";
 import { normalizeReelUrl } from "@/lib/utils/instagram";
@@ -32,7 +33,7 @@ function mapProductRow(row: Record<string, unknown>): Product {
 /** The other products a bundle product is made up of, for its detail page / edit form. */
 export async function getBundleItemsForProduct(productId: string): Promise<BundleItem[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("product_bundle_items")
       .select("quantity, item:item_product_id(id, name, slug, price, images, reel_url)")
@@ -59,6 +60,31 @@ export async function getBundleItemsForProduct(productId: string): Promise<Bundl
 }
 
 /**
+ * Slugs of bundle products that include `productId` as a component — a
+ * bundle's PDP shows live component pricing (subtotal/savings), so when a
+ * component product changes, any bundle containing it needs its cached
+ * PDP revalidated too, not just the component's own page.
+ */
+export async function getBundleSlugsContainingProduct(productId: string): Promise<string[]> {
+  try {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from("product_bundle_items")
+      .select("bundle:bundle_product_id(slug)")
+      .eq("item_product_id", productId);
+
+    if (error) throw error;
+
+    return (data as unknown as { bundle: { slug: string } | null }[])
+      .map((row) => row.bundle?.slug)
+      .filter((slug): slug is string => Boolean(slug));
+  } catch (error) {
+    console.error("getBundleSlugsContainingProduct error", error);
+    return [];
+  }
+}
+
+/**
  * Demo fallback: Supabase isn't reachable/configured yet (no project set up,
  * or migrations not run). Rather than showing an empty storefront, fall back
  * to the same sample products from supabase/seed.sql so the site is
@@ -79,7 +105,7 @@ export async function getActiveProducts(options?: { categorySlug?: string; searc
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
 
     const { data, error } = await (options?.categorySlug
       ? supabase
@@ -116,7 +142,7 @@ async function searchActiveProducts(query: string, categorySlug?: string): Promi
   const term = `%${query}%`;
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
 
     if (categorySlug) {
       // Already scoped to one category — no category-vs-title priority to resolve.
@@ -175,7 +201,7 @@ async function searchActiveProducts(query: string, categorySlug?: string): Promi
 
 export async function getFeaturedProducts(limit = 4): Promise<Product[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("products")
       .select(PRODUCT_WITH_CATEGORIES_SELECT)
@@ -195,7 +221,7 @@ export async function getFeaturedProducts(limit = 4): Promise<Product[]> {
 /** Active products tagged with a category, for a homepage horizontal row. */
 export async function getProductsByCategoryForHome(categorySlug: string, limit = 8): Promise<Product[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("products")
       .select("*, product_categories!inner(categories!inner(*))")
@@ -216,7 +242,7 @@ export async function getProductsByCategoryForHome(categorySlug: string, limit =
 /** Categories currently tagged on at least one active product — for the public filter bar. */
 export async function getActiveCategories(): Promise<Category[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("categories")
       .select("*, product_categories!inner(products!inner(is_active))")
@@ -246,7 +272,7 @@ export async function getActiveCategories(): Promise<Category[]> {
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("products")
       .select(PRODUCT_WITH_CATEGORIES_SELECT)

@@ -20,13 +20,13 @@ export default async function OrderSuccessPage(props: PageProps<"/order-success/
     ? buildOrderWhatsAppUrl(confirmation)
     : buildOrderWhatsAppUrl({
         orderNumber,
-        productName: "your order",
-        quantity: 1,
+        items: [],
         totalAmount: 0,
         customerName: "there",
         whatsappNumber: "",
         address: "",
         city: "",
+        state: null,
         pincode: "",
       });
 
@@ -43,14 +43,17 @@ export default async function OrderSuccessPage(props: PageProps<"/order-success/
 
       {confirmation && (
         <div className="mt-8 w-full rounded-2xl border border-border-soft/70 bg-white p-5 text-left">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-ink-soft">Product</span>
-            <span className="text-sm font-medium text-ink">{confirmation.productName}</span>
-          </div>
-          <div className="mt-2 flex items-center justify-between">
-            <span className="text-sm text-ink-soft">Quantity</span>
-            <span className="text-sm font-medium text-ink">{confirmation.quantity}</span>
-          </div>
+          {confirmation.items.map((item, index) => (
+            <div
+              key={`${item.productName}-${index}`}
+              className="flex items-center justify-between border-b border-border-soft/50 py-2 first:pt-0 last:border-b-0 last:pb-0"
+            >
+              <span className="text-sm text-ink-soft">
+                {item.productName} × {item.quantity}
+              </span>
+              <span className="text-sm font-medium text-ink">{formatPrice(item.subtotal)}</span>
+            </div>
+          ))}
           <div className="mt-4 flex items-center justify-between border-t border-border-soft/70 pt-4">
             <span className="font-display font-semibold text-ink">Total Amount</span>
             <span className="font-display text-lg font-semibold text-amber-dark">

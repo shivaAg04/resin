@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AlertCircle } from "lucide-react";
 import { CheckoutForm } from "@/components/checkout/CheckoutForm";
+import { CartCheckout } from "@/components/checkout/CartCheckout";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { getProductBySlug } from "@/lib/data/products";
 import { MAX_ORDER_QUANTITY } from "@/lib/utils/validation";
@@ -26,8 +27,17 @@ export default async function CheckoutPage(props: PageProps<"/checkout">) {
   const slug = typeof searchParams.product === "string" ? searchParams.product : undefined;
   const requestedQuantity = Number(searchParams.quantity) || 1;
 
+  // No single product in the URL — check out whatever's in the cart instead
+  // (cart lives in localStorage, so that path is rendered client-side).
   if (!slug) {
-    return <UnavailableState message="No product selected." />;
+    return (
+      <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
+        <h1 className="font-display text-3xl font-semibold text-ink">Checkout</h1>
+        <div className="mt-8">
+          <CartCheckout />
+        </div>
+      </div>
+    );
   }
 
   const product = await getProductBySlug(slug);
@@ -45,11 +55,13 @@ export default async function CheckoutPage(props: PageProps<"/checkout">) {
 
       <div className="mt-8">
         <CheckoutForm
-          productSlug={product.slug}
-          productName={product.name}
-          productImage={product.images?.[0]}
-          price={Number(product.price)}
-          initialQuantity={Math.min(Math.max(requestedQuantity, 1), MAX_ORDER_QUANTITY)}
+          single={{
+            productSlug: product.slug,
+            productName: product.name,
+            productImage: product.images?.[0],
+            price: Number(product.price),
+            initialQuantity: Math.min(Math.max(requestedQuantity, 1), MAX_ORDER_QUANTITY),
+          }}
         />
       </div>
     </div>

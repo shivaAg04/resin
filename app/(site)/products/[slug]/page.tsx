@@ -8,9 +8,19 @@ import { ProductImage } from "@/components/products/ProductImage";
 import { ReviewsCarousel } from "@/components/products/ReviewsCarousel";
 import { InstagramEmbed, processInstagramEmbeds } from "@/components/InstagramEmbed";
 import { Badge } from "@/components/ui/Badge";
-import { getDisplayReelsForProduct, getProductBySlug } from "@/lib/data/products";
+import { getActiveProducts, getDisplayReelsForProduct, getProductBySlug } from "@/lib/data/products";
 import { getReviewsForProductPage } from "@/lib/data/reviews";
 import { formatPrice } from "@/lib/utils/format";
+
+// Prerenders every active product at build time so PDPs are served from
+// cache instead of hitting Supabase on every visit. New/edited products
+// still work via on-demand generation (dynamicParams defaults to true) and
+// get cached from their first request; admin mutations invalidate the
+// cache for a given slug via revalidatePath.
+export async function generateStaticParams() {
+  const products = await getActiveProducts();
+  return products.map((product) => ({ slug: product.slug }));
+}
 
 export async function generateMetadata(props: PageProps<"/products/[slug]">): Promise<Metadata> {
   const { slug } = await props.params;
@@ -76,7 +86,12 @@ export default async function ProductDetailPage(props: PageProps<"/products/[slu
           )}
 
           <div className="mt-2 border-t border-border-soft/70 pt-6">
-            <BuyNowPanel slug={product.slug} price={Number(product.price)} />
+            <BuyNowPanel
+              slug={product.slug}
+              name={product.name}
+              price={Number(product.price)}
+              image={product.images?.[0]}
+            />
           </div>
 
           {product.bundle_items.length > 0 && (

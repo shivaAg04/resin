@@ -38,10 +38,15 @@ export const customerDetailsSchema = z.object({
   specialInstructions: z.string().trim().max(500).optional(),
 });
 
-export const createOrderSchema = customerDetailsSchema.extend({
+export const cartItemSchema = z.object({
   productSlug: z.string().trim().min(1, "Product is required"),
   quantity: z.coerce.number().int().min(1, "Quantity must be at least 1").max(MAX_ORDER_QUANTITY),
 });
 
+export const createOrderSchema = customerDetailsSchema.extend({
+  items: z.array(cartItemSchema).min(1, "Your cart is empty"),
+});
+
 export type CustomerDetailsInput = z.infer<typeof customerDetailsSchema>;
+export type CartItemInput = z.infer<typeof cartItemSchema>;
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;

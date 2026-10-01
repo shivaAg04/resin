@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MessageCircle } from "lucide-react";
+import { CopyableId } from "@/components/admin/CopyableId";
+import { PaymentBadge, getPaymentState } from "@/components/admin/PaymentBadge";
 import { OrderStatusSelect } from "@/components/admin/OrderStatusSelect";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { getOrderWithItemsAdmin } from "@/lib/data/orders";
@@ -77,6 +79,46 @@ export default async function AdminOrderDetailPage(props: PageProps<"/admin/orde
             </>
           )}
         </div>
+      </div>
+
+      <div className="mt-6 rounded-2xl border border-border-soft/70 bg-white p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-display text-base font-semibold text-ink">Payment</h2>
+          <PaymentBadge order={order} />
+        </div>
+        <dl className="mt-3 space-y-2 text-sm">
+          <div className="flex justify-between gap-4">
+            <dt className="text-ink-soft">Method</dt>
+            <dd className="text-right text-ink">
+              {order.payment_method === "online" ? "Online (Razorpay)" : "Cash on Delivery / WhatsApp"}
+            </dd>
+          </div>
+          {order.razorpay_payment_id && (
+            <div className="flex justify-between gap-4">
+              <dt className="text-ink-soft">Razorpay Payment ID</dt>
+              <dd className="text-right">
+                <CopyableId value={order.razorpay_payment_id} />
+              </dd>
+            </div>
+          )}
+          {order.razorpay_order_id && (
+            <div className="flex justify-between gap-4">
+              <dt className="text-ink-soft">Razorpay Order ID</dt>
+              <dd className="text-right">
+                <CopyableId value={order.razorpay_order_id} />
+              </dd>
+            </div>
+          )}
+        </dl>
+        {getPaymentState(order) === "cod" && (
+          <p className="mt-3 text-xs text-ink-soft">Collect {formatPrice(Number(order.total_amount))} on delivery.</p>
+        )}
+        {getPaymentState(order) === "pending" && (
+          <p className="mt-3 text-xs text-red-700">
+            The customer started an online payment but never finished it. Don&apos;t ship until payment is
+            received.
+          </p>
+        )}
       </div>
 
       <div className="mt-6 overflow-hidden rounded-2xl border border-border-soft/70 bg-white">

@@ -1,10 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { normalizeReelUrl } from "@/lib/utils/instagram";
 import type { Reel } from "@/types";
 
 export async function getActiveReels(): Promise<Reel[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("reels")
       .select("*")

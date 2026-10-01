@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CopyableId } from "@/components/admin/CopyableId";
+import { PaymentBadge } from "@/components/admin/PaymentBadge";
 import { OrderStatusFilter } from "@/components/admin/OrderStatusFilter";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { getOrdersAdmin } from "@/lib/data/orders";
@@ -38,6 +40,8 @@ export default async function AdminOrdersPage(props: PageProps<"/admin/orders">)
                   <th className="px-5 py-3 font-medium">Customer</th>
                   <th className="px-5 py-3 font-medium">WhatsApp</th>
                   <th className="px-5 py-3 font-medium">Total</th>
+                  <th className="px-5 py-3 font-medium">Payment</th>
+                  <th className="px-5 py-3 font-medium">Razorpay IDs</th>
                   <th className="px-5 py-3 font-medium">Status</th>
                   <th className="px-5 py-3 font-medium">Created At</th>
                 </tr>
@@ -53,6 +57,19 @@ export default async function AdminOrdersPage(props: PageProps<"/admin/orders">)
                     <td className="px-5 py-3 text-ink">{order.customer_name}</td>
                     <td className="px-5 py-3 text-ink-soft">{order.whatsapp_number}</td>
                     <td className="px-5 py-3 tabular-nums text-ink">{formatPrice(Number(order.total_amount))}</td>
+                    <td className="px-5 py-3">
+                      <PaymentBadge order={order} />
+                    </td>
+                    <td className="px-5 py-3">
+                      {order.razorpay_order_id || order.razorpay_payment_id ? (
+                        <div className="flex flex-col gap-1">
+                          {order.razorpay_order_id && <CopyableId value={order.razorpay_order_id} />}
+                          {order.razorpay_payment_id && <CopyableId value={order.razorpay_payment_id} />}
+                        </div>
+                      ) : (
+                        <span className="text-ink-soft/60">—</span>
+                      )}
+                    </td>
                     <td className="px-5 py-3">
                       <StatusBadge status={order.status} />
                     </td>

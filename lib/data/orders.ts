@@ -2,33 +2,45 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getProductForOrder } from "@/lib/data/products";
 import type { CreateOrderInput } from "@/lib/utils/validation";
-import type { Order, OrderStatus, OrderWithItems } from "@/types";
+import type { OrderConfirmationItem } from "@/lib/utils/order-confirmation";
+import type { Order, OrderStatus, OrderWithItems, PaymentMethod } from "@/types";
 
 export interface CreateOrderResult {
   order?: Order;
-  productName?: string;
-  unitPrice?: number;
-  subtotal?: number;
+  items?: OrderConfirmationItem[];
   error?: string;
 }
 
 /**
- * Creates an order on behalf of an anonymous customer. Runs entirely with
- * the service-role client (server-only) so it can write to `orders` /
- * `order_items`, which RLS otherwise locks down to admins. The price is
- * always read fresh from the database — the frontend's price is never
- * trusted.
+ * Creates an order (one or more line items — a cart, or a single "Buy Now")
+ * on behalf of an anonymous customer. Runs entirely with the service-role
+ * client (server-only) so it can write to `orders` / `order_items`, which
+ * RLS otherwise locks down to admins. Every price is read fresh from the
+ * database — the frontend's price is never trusted.
  */
-export async function createOrderFromCheckout(input: CreateOrderInput): Promise<CreateOrderResult> {
-  const product = await getProductForOrder(input.productSlug);
+export async function createOrderFromCheckout(
+  input: CreateOrderInput,
+  paymentMethod: PaymentMethod = "cod",
+): Promise<CreateOrderResult> {
+  const resolvedItems: {
+    productId: string;
+    productName: string;
+    quantity: number;
+    unitPrice: number;
+    subtotal: number;
+  }[] = [];
 
-  if (!product || !product.is_active) {
-    return { error: "This product is no longer available." };
+  for (const line of input.items) {
+    const product = await getProductForOrder(line.productSlug);
+    if (!product || !product.is_active) {
+      return { error: "One of the items in your cart is no longer available. Please review your cart and try again." };
+    }
+    const unitPrice = Number(product.price);
+    const subtotal = Math.round(unitPrice * line.quantity * 100) / 100;
+    resolvedItems.push({ productId: product.id, productName: product.name, quantity: line.quantity, unitPrice, subtotal });
   }
 
-  const unitPrice = Number(product.price);
-  const subtotal = Math.round(unitPrice * input.quantity * 100) / 100;
-  const totalAmount = subtotal;
+  const totalAmount = Math.round(resolvedItems.reduce((sum, item) => sum + item.subtotal, 0) * 100) / 100;
 
   const supabase = createAdminClient();
 
@@ -45,6 +57,8 @@ export async function createOrderFromCheckout(input: CreateOrderInput): Promise<
       special_instructions: input.specialInstructions || null,
       total_amount: totalAmount,
       status: "new",
+      payment_method: paymentMethod,
+      payment_status: "pending",
     })
     .select("*")
     .single();
@@ -54,14 +68,16 @@ export async function createOrderFromCheckout(input: CreateOrderInput): Promise<
     return { error: "We couldn't place your order. Please try again." };
   }
 
-  const { error: itemError } = await supabase.from("order_items").insert({
-    order_id: order.id,
-    product_id: product.id,
-    product_name: product.name,
-    quantity: input.quantity,
-    unit_price: unitPrice,
-    subtotal,
-  });
+  const { error: itemError } = await supabase.from("order_items").insert(
+    resolvedItems.map((item) => ({
+      order_id: order.id,
+      product_id: item.productId,
+      product_name: item.productName,
+      quantity: item.quantity,
+      unit_price: item.unitPrice,
+      subtotal: item.subtotal,
+    })),
+  );
 
   if (itemError) {
     console.error("createOrderFromCheckout item insert error", itemError);
@@ -70,7 +86,76 @@ export async function createOrderFromCheckout(input: CreateOrderInput): Promise<
     return { error: "We couldn't place your order. Please try again." };
   }
 
-  return { order: order as Order, productName: product.name, unitPrice, subtotal };
+  return {
+    order: order as Order,
+    items: resolvedItems.map(({ productName, quantity, unitPrice, subtotal }) => ({
+      productName,
+      quantity,
+      unitPrice,
+      subtotal,
+    })),
+  };
+}
+
+// ------------------------------------------------------------
+// Online payments (Razorpay)
+// ------------------------------------------------------------
+
+/** Used to roll back an order started for online payment if the Razorpay order creation call itself fails. */
+export async function deleteOrder(orderId: string): Promise<void> {
+  const supabase = createAdminClient();
+  await supabase.from("orders").delete().eq("id", orderId);
+}
+
+export async function attachRazorpayOrderId(orderId: string, razorpayOrderId: string): Promise<{ error?: string }> {
+  const supabase = createAdminClient();
+  const { error } = await supabase.from("orders").update({ razorpay_order_id: razorpayOrderId }).eq("id", orderId);
+  if (error) {
+    console.error("attachRazorpayOrderId error", error);
+    return { error: "Could not start payment. Please try again." };
+  }
+  return {};
+}
+
+/**
+ * Uses the service-role client (not the cookie-bound one) since this is
+ * looked up on behalf of an anonymous customer right after payment, before
+ * any admin session exists — same reasoning as getProductForOrder.
+ */
+export async function getOrderWithItemsByRazorpayOrderId(razorpayOrderId: string): Promise<OrderWithItems | null> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("orders")
+    .select("*, order_items(*)")
+    .eq("razorpay_order_id", razorpayOrderId)
+    .maybeSingle();
+
+  if (error) {
+    console.error("getOrderWithItemsByRazorpayOrderId error", error);
+    return null;
+  }
+  return data as OrderWithItems | null;
+}
+
+/**
+ * Marks an order paid once its Razorpay signature has been verified. Scoped
+ * to `payment_status = 'pending'` so this is safe to call twice (once from
+ * the checkout page's own verify call, once from the webhook safety net)
+ * without double-processing.
+ */
+export async function markOrderPaid(razorpayOrderId: string, razorpayPaymentId: string): Promise<{ error?: string }> {
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("orders")
+    .update({ payment_status: "paid", status: "confirmed", razorpay_payment_id: razorpayPaymentId })
+    .eq("razorpay_order_id", razorpayOrderId)
+    .eq("payment_status", "pending");
+
+  if (error) {
+    console.error("markOrderPaid error", error);
+    return { error: "Could not confirm payment." };
+  }
+  return {};
 }
 
 // ------------------------------------------------------------

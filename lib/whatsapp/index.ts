@@ -1,4 +1,5 @@
 import { formatPrice } from "@/lib/utils/format";
+import type { OrderConfirmationPayload } from "@/lib/utils/order-confirmation";
 
 function digitsOnly(value: string): string {
   return value.replace(/\D/g, "");
@@ -18,27 +19,17 @@ export function buildGenericWhatsAppUrl(message = "Hi! I'd like to know more abo
   return buildWhatsAppUrl(getBusinessWhatsAppNumber(), message);
 }
 
-export interface OrderConfirmationMessageInput {
-  orderNumber: string;
-  productName: string;
-  quantity: number;
-  totalAmount: number;
-  customerName: string;
-  whatsappNumber: string;
-  address: string;
-  city: string;
-  state?: string | null;
-  pincode: string;
-}
+export type OrderConfirmationMessageInput = OrderConfirmationPayload;
 
 export function buildOrderConfirmationMessage(order: OrderConfirmationMessageInput): string {
+  const itemLines = order.items.map((item) => `${item.productName} × ${item.quantity} — ${formatPrice(item.subtotal)}`);
+
   return [
     "Hi, I want to confirm my order.",
     "",
     `Order ID: ${order.orderNumber}`,
     "",
-    `Product: ${order.productName}`,
-    `Quantity: ${order.quantity}`,
+    ...itemLines,
     `Total: ${formatPrice(order.totalAmount)}`,
     "",
     `Name: ${order.customerName}`,

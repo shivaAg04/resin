@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { CartIcon } from "@/components/CartIcon";
 
 export function SiteHeader() {
   return (
@@ -12,6 +13,7 @@ export function SiteHeader() {
           <Link href="/products" className="text-ink-soft transition-colors hover:text-ink">
             Shop
           </Link>
+          <CartIcon />
         </nav>
       </div>
     </header>

@@ -1,10 +1,10 @@
 import { cn } from "@/lib/utils/format";
 
 export type ButtonVariant = "primary" | "secondary" | "outline" | "whatsapp" | "ghost";
-export type ButtonSize = "sm" | "md" | "lg";
+export type ButtonSize = "xs" | "sm" | "md" | "lg";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber";
+  "inline-flex items-center justify-center rounded-full font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber";
 
 // These pastels fail WCAG AA with white/cream text (best case ~2:1), so
 // buttons pair a light pink background with dark ink text instead — and
@@ -19,9 +19,10 @@ const variants: Record<ButtonVariant, string> = {
 };
 
 const sizes: Record<ButtonSize, string> = {
-  sm: "h-9 px-4 text-sm",
-  md: "h-11 px-6 text-sm",
-  lg: "h-13 px-8 text-base",
+  xs: "h-8 gap-1 whitespace-nowrap px-2.5 text-xs",
+  sm: "h-9 gap-2 px-4 text-sm",
+  md: "h-11 gap-2 px-6 text-sm",
+  lg: "h-13 gap-2 px-8 text-base",
 };
 
 export function buttonClasses(

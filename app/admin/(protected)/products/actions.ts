@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import {
   createProduct,
   deleteProduct,
+  getBundleSlugsContainingProduct,
+  getProductByIdAdmin,
   moveProductSortOrder,
   setProductActive,
   setProductSortOrder,
@@ -12,12 +14,19 @@ import {
 } from "@/lib/data/products";
 import type { ProductInput } from "@/types";
 
+/** Revalidates any bundle PDP that includes this product as a component. */
+async function revalidateContainingBundles(productId: string) {
+  const slugs = await getBundleSlugsContainingProduct(productId);
+  for (const slug of slugs) revalidatePath(`/products/${slug}`);
+}
+
 export async function createProductAction(input: ProductInput): Promise<{ error?: string }> {
   const { product, error } = await createProduct(input);
   if (error || !product) return { error };
 
   revalidatePath("/admin/products");
   revalidatePath("/products");
+  revalidatePath("/");
   redirect("/admin/products");
 }
 
@@ -28,14 +37,23 @@ export async function updateProductAction(id: string, input: ProductInput): Prom
   revalidatePath("/admin/products");
   revalidatePath("/products");
   revalidatePath(`/products/${product.slug}`);
+  revalidatePath("/");
+  await revalidateContainingBundles(id);
   redirect("/admin/products");
 }
 
 export async function deleteProductAction(formData: FormData): Promise<void> {
   const id = String(formData.get("id"));
+  // Grab the slug before deleting so the now-orphaned PDP cache entry can
+  // be cleared too (it's prerendered/cached — without this it would keep
+  // serving the stale page instead of 404ing).
+  const product = await getProductByIdAdmin(id);
+  await revalidateContainingBundles(id);
   await deleteProduct(id);
   revalidatePath("/admin/products");
   revalidatePath("/products");
+  revalidatePath("/");
+  if (product) revalidatePath(`/products/${product.slug}`);
 }
 
 export async function toggleProductActiveAction(formData: FormData): Promise<void> {
@@ -44,6 +62,10 @@ export async function toggleProductActiveAction(formData: FormData): Promise<voi
   await setProductActive(id, nextActive);
   revalidatePath("/admin/products");
   revalidatePath("/products");
+  revalidatePath("/");
+  const product = await getProductByIdAdmin(id);
+  if (product) revalidatePath(`/products/${product.slug}`);
+  await revalidateContainingBundles(id);
 }
 
 export async function moveProductSortOrderAction(formData: FormData): Promise<void> {

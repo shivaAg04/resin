@@ -1,14 +1,12 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { ProductImage } from "@/components/products/ProductImage";
-import { Badge } from "@/components/ui/Badge";
+import { AddToCartButton } from "@/components/products/AddToCartButton";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { formatPrice } from "@/lib/utils/format";
 import type { Product } from "@/types";
 
 export function ProductCard({ product }: { product: Product }) {
-  const primaryCategory = product.categories[0];
-
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-ink/[0.06] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-ink/10">
       <div className="relative">
@@ -17,19 +15,22 @@ export function ProductCard({ product }: { product: Product }) {
           alt={product.name}
           className="aspect-square w-full transition-transform duration-500 group-hover:scale-105"
         />
-        {primaryCategory && (
-          <Badge className="absolute left-3 top-3 border-white/40 bg-white/85 backdrop-blur-sm">
-            {primaryCategory.name}
-          </Badge>
-        )}
+        <AddToCartButton
+          productSlug={product.slug}
+          name={product.name}
+          price={Number(product.price)}
+          image={product.images?.[0]}
+          iconOnly
+          className="absolute right-2 top-2"
+        />
       </div>
 
-      <div className="flex flex-1 flex-col gap-1 p-5">
-        <h3 className="line-clamp-1 font-display text-lg leading-tight text-ink transition-colors group-hover:text-amber-dark">
+      <div className="flex flex-1 flex-col gap-1 p-3 sm:p-5">
+        <h3 className="line-clamp-2 font-display text-sm leading-snug text-ink transition-colors group-hover:text-amber-dark sm:text-lg sm:leading-tight">
           {product.name}
         </h3>
 
-        <span className="font-display text-xl font-medium text-amber-dark">
+        <span className="font-display text-base font-medium text-amber-dark sm:text-xl">
           {formatPrice(product.price)}
         </span>
 
@@ -41,10 +42,10 @@ export function ProductCard({ product }: { product: Product }) {
           <ButtonLink
             href={`/checkout?product=${product.slug}&quantity=1`}
             variant="primary"
-            size="sm"
-            className="relative z-10 w-full"
+            size="xs"
+            className="relative z-10 w-full sm:h-9 sm:px-4 sm:text-sm"
           >
-            Buy Now <ArrowRight className="h-3.5 w-3.5" />
+            Buy Now <ArrowRight className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" />
           </ButtonLink>
         </div>
       </div>

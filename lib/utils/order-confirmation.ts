@@ -7,12 +7,16 @@
  * phone numbers. This payload is the customer's own just-submitted data
  * being echoed back for display only; it is never trusted for a write.
  */
-export interface OrderConfirmationPayload {
-  orderNumber: string;
+export interface OrderConfirmationItem {
   productName: string;
   quantity: number;
   unitPrice: number;
   subtotal: number;
+}
+
+export interface OrderConfirmationPayload {
+  orderNumber: string;
+  items: OrderConfirmationItem[];
   totalAmount: number;
   customerName: string;
   whatsappNumber: string;
@@ -31,7 +35,7 @@ export function decodeOrderConfirmation(encoded: string): OrderConfirmationPaylo
   try {
     const json = Buffer.from(decodeURIComponent(encoded), "base64").toString("utf-8");
     const parsed = JSON.parse(json);
-    if (typeof parsed?.orderNumber !== "string") return null;
+    if (typeof parsed?.orderNumber !== "string" || !Array.isArray(parsed?.items)) return null;
     return parsed as OrderConfirmationPayload;
   } catch {
     return null;

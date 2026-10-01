@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import type { Product, ProductReview } from "@/types";
 
 /**
@@ -12,7 +13,7 @@ export async function getReviewsForProductPage(product: Product): Promise<Produc
   if (product.bundle_items.length === 0) return ownReviews;
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const componentIds = product.bundle_items.map((item) => item.product_id);
     const { data, error } = await supabase
       .from("product_reviews")
@@ -39,7 +40,7 @@ export async function getReviewsForProductPage(product: Product): Promise<Produc
 
 export async function getActiveReviewsForProduct(productId: string): Promise<ProductReview[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("product_reviews")
       .select("*")

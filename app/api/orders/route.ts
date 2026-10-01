@@ -28,10 +28,7 @@ export async function POST(request: NextRequest) {
 
   const confirmation = encodeOrderConfirmation({
     orderNumber: result.order.order_number,
-    productName: result.productName!,
-    quantity: parsed.data.quantity,
-    unitPrice: result.unitPrice!,
-    subtotal: result.subtotal!,
+    items: result.items!,
     totalAmount: Number(result.order.total_amount),
     customerName: result.order.customer_name,
     whatsappNumber: result.order.whatsapp_number,

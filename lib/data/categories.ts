@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { MOCK_PRODUCTS } from "@/lib/data/mock-products";
 import type { Category } from "@/types";
 
@@ -24,7 +25,7 @@ export async function getAllCategories(): Promise<Category[]> {
 /** Categories enabled for the homepage, in admin-configured display order. */
 export async function getHomeCategories(): Promise<Category[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("categories")
       .select("*")

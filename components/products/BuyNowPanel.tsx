@@ -4,11 +4,19 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { QuantitySelector } from "@/components/products/QuantitySelector";
+import { AddToCartButton } from "@/components/products/AddToCartButton";
 import { Button } from "@/components/ui/Button";
 import { formatPrice } from "@/lib/utils/format";
 import { MAX_ORDER_QUANTITY } from "@/lib/utils/validation";
 
-export function BuyNowPanel({ slug, price }: { slug: string; price: number }) {
+interface BuyNowPanelProps {
+  slug: string;
+  name: string;
+  price: number;
+  image?: string;
+}
+
+export function BuyNowPanel({ slug, name, price, image }: BuyNowPanelProps) {
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
 
@@ -20,9 +28,12 @@ export function BuyNowPanel({ slug, price }: { slug: string; price: number }) {
     <>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <QuantitySelector quantity={quantity} onChange={setQuantity} max={MAX_ORDER_QUANTITY} />
-        <Button onClick={handleBuyNow} size="lg" className="w-full sm:w-auto">
-          Buy Now <ArrowRight className="h-4 w-4" />
-        </Button>
+        <div className="flex gap-3">
+          <AddToCartButton productSlug={slug} name={name} price={price} image={image} quantity={quantity} className="flex-1 sm:flex-none" />
+          <Button onClick={handleBuyNow} size="lg" className="flex-1 sm:flex-none">
+            Buy Now <ArrowRight className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       {/* Sticky mobile CTA */}

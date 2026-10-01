@@ -1,12 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Camera, MessageCircle } from "lucide-react";
+import { Camera, Globe, Mail, MessageCircle, Users } from "lucide-react";
 import { buildGenericWhatsAppUrl } from "@/lib/whatsapp";
 import { getActiveCategories } from "@/lib/data/products";
+import { POLICY_LINKS } from "@/lib/legal";
 
 export async function SiteFooter() {
   const instagramUrl = process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? "#";
   const whatsappUrl = buildGenericWhatsAppUrl();
+  const facebookUrl = process.env.NEXT_PUBLIC_FACEBOOK_URL;
+  const communityUrl = process.env.NEXT_PUBLIC_WHATSAPP_COMMUNITY_URL;
+  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL;
   const categories = await getActiveCategories();
 
   return (
@@ -62,13 +66,52 @@ export async function SiteFooter() {
             >
               <MessageCircle className="h-4 w-4" /> Chat on WhatsApp
             </a>
+            {communityUrl && (
+              <a
+                href={communityUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-ink-soft transition-colors hover:text-ink"
+              >
+                <Users className="h-4 w-4" /> Join our WhatsApp Community
+              </a>
+            )}
+            {facebookUrl && (
+              <a
+                href={facebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-ink-soft transition-colors hover:text-ink"
+              >
+                <Globe className="h-4 w-4" /> Follow on Facebook
+              </a>
+            )}
+            {contactEmail && (
+              <a
+                href={`mailto:${contactEmail}`}
+                className="flex items-center gap-2 text-ink-soft transition-colors hover:text-ink"
+              >
+                <Mail className="h-4 w-4" /> {contactEmail}
+              </a>
+            )}
             <Link href="/admin/login" className="text-xs text-ink-soft/60 transition-colors hover:text-ink-soft">
               Admin login
             </Link>
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-2 border-t border-border-soft/70 pt-6 text-xs text-ink-soft/70 sm:flex-row sm:items-center sm:justify-between">
+        <nav
+          aria-label="Policies"
+          className="mt-12 flex flex-wrap gap-x-5 gap-y-2 border-t border-border-soft/70 pt-6 text-xs"
+        >
+          {POLICY_LINKS.map((link) => (
+            <Link key={link.href} href={link.href} className="text-ink-soft transition-colors hover:text-ink">
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="mt-4 flex flex-col gap-2 border-border-soft/70 pt-6 text-xs text-ink-soft/70 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} Spilled Colours. All rights reserved.</p>
           <p>Handmade with love, shipped across India.</p>
         </div>
