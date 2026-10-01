@@ -13,6 +13,8 @@ export function formatDate(dateString: string): string {
     year: "numeric",
     hour: "numeric",
     minute: "2-digit",
+    // Pinned so server-rendered dates show Indian time, not the server's UTC.
+    timeZone: "Asia/Kolkata",
   }).format(new Date(dateString));
 }
 

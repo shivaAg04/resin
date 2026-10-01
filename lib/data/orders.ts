@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getProductForOrder } from "@/lib/data/products";
 import type { CreateOrderInput } from "@/lib/utils/validation";
 import type { OrderConfirmationItem } from "@/lib/utils/order-confirmation";
+import type { OrderSort, PaymentFilter } from "@/lib/admin/order-filters";
 import type { Order, OrderStatus, OrderWithItems, PaymentMethod } from "@/types";
 
 export interface CreateOrderResult {
@@ -162,18 +163,78 @@ export async function markOrderPaid(razorpayOrderId: string, razorpayPaymentId: 
 // Admin
 // ------------------------------------------------------------
 
-export async function getOrdersAdmin(status?: OrderStatus | "all"): Promise<Order[]> {
+export interface AdminOrderFilters {
+  status?: OrderStatus | "all";
+  payment?: PaymentFilter | "all";
+  /** Matches order number, customer name, WhatsApp number or either Razorpay ID. */
+  search?: string;
+  /** Inclusive IST calendar dates, YYYY-MM-DD. */
+  from?: string;
+  to?: string;
+  sort?: OrderSort;
+}
+
+export type AdminOrderRow = Order & { order_items: { product_name: string; quantity: number }[] };
+
+export async function getOrdersAdmin(filters: AdminOrderFilters = {}): Promise<AdminOrderRow[]> {
   const supabase = await createClient();
-  let query = supabase.from("orders").select("*").order("created_at", { ascending: false });
-  if (status && status !== "all") {
-    query = query.eq("status", status);
+  let query = supabase.from("orders").select("*, order_items(product_name, quantity)");
+
+  if (filters.status && filters.status !== "all") {
+    query = query.eq("status", filters.status);
   }
+
+  switch (filters.payment) {
+    case "cod":
+      query = query.eq("payment_method", "cod");
+      break;
+    case "paid":
+      query = query.eq("payment_method", "online").eq("payment_status", "paid");
+      break;
+    case "unpaid":
+      query = query.eq("payment_method", "online").eq("payment_status", "pending");
+      break;
+    case "failed":
+      query = query.eq("payment_method", "online").eq("payment_status", "failed");
+      break;
+  }
+
+  // The value is double-quoted inside or() so dots and spaces (e.g. "S. Kumar")
+  // are safe; strip the few characters that could still break out of it.
+  const search = filters.search?.replace(/["\\,()*%]/g, " ").trim();
+  if (search) {
+    const pattern = `"%${search}%"`;
+    query = query.or(
+      [
+        `order_number.ilike.${pattern}`,
+        `customer_name.ilike.${pattern}`,
+        `whatsapp_number.ilike.${pattern}`,
+        `razorpay_order_id.ilike.${pattern}`,
+        `razorpay_payment_id.ilike.${pattern}`,
+      ].join(","),
+    );
+  }
+
+  // The shop runs on IST, so date filters mean IST calendar days.
+  if (filters.from) query = query.gte("created_at", `${filters.from}T00:00:00+05:30`);
+  if (filters.to) query = query.lte("created_at", `${filters.to}T23:59:59.999+05:30`);
+
+  const sort = filters.sort ?? "newest";
+  query =
+    sort === "oldest"
+      ? query.order("created_at", { ascending: true })
+      : sort === "amount_desc"
+        ? query.order("total_amount", { ascending: false }).order("created_at", { ascending: false })
+        : sort === "amount_asc"
+          ? query.order("total_amount", { ascending: true }).order("created_at", { ascending: false })
+          : query.order("created_at", { ascending: false });
+
   const { data, error } = await query;
   if (error) {
     console.error("getOrdersAdmin error", error);
     return [];
   }
-  return data as Order[];
+  return data as AdminOrderRow[];
 }
 
 export async function getOrderWithItemsAdmin(id: string): Promise<OrderWithItems | null> {
@@ -212,7 +273,9 @@ export interface DashboardStats {
 
 export async function getDashboardStats(): Promise<DashboardStats> {
   const supabase = await createClient();
-  const { data, error } = await supabase.from("orders").select("status, total_amount, created_at");
+  const { data, error } = await supabase
+    .from("orders")
+    .select("status, total_amount, created_at, payment_method, payment_status");
 
   if (error || !data) {
     console.error("getDashboardStats error", error);
@@ -226,12 +289,17 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     };
   }
 
-  const now = new Date();
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  // "Today" means today in India, not in the server's timezone (UTC on Vercel).
+  const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+  const nowIst = new Date(Date.now() + IST_OFFSET_MS);
+  const startOfToday = new Date(
+    Date.UTC(nowIst.getUTCFullYear(), nowIst.getUTCMonth(), nowIst.getUTCDate()) - IST_OFFSET_MS,
+  );
+  const startOfMonth = new Date(Date.UTC(nowIst.getUTCFullYear(), nowIst.getUTCMonth(), 1) - IST_OFFSET_MS);
 
   const pendingStatuses: OrderStatus[] = ["new", "confirmed", "processing", "shipped"];
 
+  let totalOrders = 0;
   let ordersToday = 0;
   let ordersThisMonth = 0;
   let pendingOrders = 0;
@@ -239,6 +307,9 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   let totalRevenue = 0;
 
   for (const row of data) {
+    // An online order nobody finished paying for is an abandoned checkout, not an order.
+    if (row.payment_method === "online" && row.payment_status !== "paid") continue;
+    totalOrders += 1;
     const createdAt = new Date(row.created_at);
     if (createdAt >= startOfToday) ordersToday += 1;
     if (createdAt >= startOfMonth) ordersThisMonth += 1;
@@ -248,7 +319,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   }
 
   return {
-    totalOrders: data.length,
+    totalOrders,
     ordersToday,
     ordersThisMonth,
     pendingOrders,

@@ -26,6 +26,10 @@ export function getPaymentState(order: Pick<Order, "payment_method" | "payment_s
   return order.payment_status;
 }
 
+export function getPaymentLabel(order: Pick<Order, "payment_method" | "payment_status">): string {
+  return labels[getPaymentState(order)];
+}
+
 export function PaymentBadge({ order }: { order: Pick<Order, "payment_method" | "payment_status"> }) {
   const state = getPaymentState(order);
   return (

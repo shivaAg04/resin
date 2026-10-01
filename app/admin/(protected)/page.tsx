@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { StatCard } from "@/components/admin/StatCard";
+import { PaymentBadge } from "@/components/admin/PaymentBadge";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { getDashboardStats, getRecentOrdersAdmin } from "@/lib/data/orders";
 import { formatDate, formatPrice } from "@/lib/utils/format";
@@ -38,6 +39,7 @@ export default async function AdminDashboardPage() {
                   <th className="px-5 py-3 font-medium">Customer</th>
                   <th className="px-5 py-3 font-medium">Product</th>
                   <th className="px-5 py-3 font-medium">Amount</th>
+                  <th className="px-5 py-3 font-medium">Payment</th>
                   <th className="px-5 py-3 font-medium">Status</th>
                   <th className="px-5 py-3 font-medium">Date</th>
                   <th className="px-5 py-3 font-medium">Action</th>
@@ -50,6 +52,9 @@ export default async function AdminDashboardPage() {
                     <td className="px-5 py-3 text-ink-soft">{order.customer_name}</td>
                     <td className="px-5 py-3 text-ink-soft">{order.product_name ?? "—"}</td>
                     <td className="px-5 py-3 tabular-nums text-ink">{formatPrice(Number(order.total_amount))}</td>
+                    <td className="px-5 py-3">
+                      <PaymentBadge order={order} />
+                    </td>
                     <td className="px-5 py-3">
                       <StatusBadge status={order.status} />
                     </td>
