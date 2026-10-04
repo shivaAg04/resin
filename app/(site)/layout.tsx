@@ -2,6 +2,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { WhatsAppFloatingButton } from "@/components/WhatsAppFloatingButton";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
+import { IntroAnimationGate } from "@/components/IntroAnimationGate";
 
 export default function SiteLayout({ children }: LayoutProps<"/">) {
   return (
@@ -11,6 +12,7 @@ export default function SiteLayout({ children }: LayoutProps<"/">) {
       <SiteFooter />
       <WhatsAppFloatingButton />
       <ScrollToTopButton />
+      <IntroAnimationGate />
     </div>
   );
 }

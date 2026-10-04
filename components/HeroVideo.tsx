@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
+import { cn } from "@/lib/utils/format";
 
 const MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
@@ -45,20 +46,25 @@ function getSaveDataServerSnapshot() {
   return false;
 }
 
-/** True once the window `load` event has fired (immediately if it already has). */
-function usePageLoaded(): boolean {
-  const [loaded, setLoaded] = useState(false);
-  useEffect(() => {
-    const markLoaded = () => setLoaded(true);
-    if (document.readyState === "complete") {
-      const id = window.setTimeout(markLoaded, 0);
-      return () => window.clearTimeout(id);
-    }
-    window.addEventListener("load", markLoaded, { once: true });
-    return () => window.removeEventListener("load", markLoaded);
-  }, []);
-  return loaded;
+function subscribePageLoad(callback: () => void) {
+  window.addEventListener("load", callback);
+  return () => window.removeEventListener("load", callback);
 }
+
+function getPageLoadSnapshot() {
+  return document.readyState === "complete";
+}
+
+function getPageLoadServerSnapshot() {
+  return false;
+}
+
+/**
+ * Only the very first appearance fades in. Coming back to the homepage via
+ * client-side navigation remounts this component, and replaying the fade
+ * made the hero visibly blink every time.
+ */
+let hasShownVideo = false;
 
 /**
  * Skips the autoplaying background video for reduced-motion users and for
@@ -70,7 +76,13 @@ export function HeroVideo({ src }: { src: string }) {
   const reducedMotion = useSyncExternalStore(subscribeMotion, getMotionSnapshot, getMotionServerSnapshot);
   const saveData = useSyncExternalStore(subscribeSaveData, getSaveDataSnapshot, getSaveDataServerSnapshot);
 
-  const pageLoaded = usePageLoaded();
+  // On a client-side navigation back to the homepage the page has long
+  // since loaded, so this is true on the very first render: no blink.
+  const pageLoaded = useSyncExternalStore(subscribePageLoad, getPageLoadSnapshot, getPageLoadServerSnapshot);
+  const [fadeIn] = useState(() => !hasShownVideo);
+  useEffect(() => {
+    if (pageLoaded && !reducedMotion && !saveData) hasShownVideo = true;
+  }, [pageLoaded, reducedMotion, saveData]);
 
   // Mount the video only after the page's own images and scripts have
   // finished loading, so this ~650KB download never competes with them.
@@ -84,7 +96,7 @@ export function HeroVideo({ src }: { src: string }) {
       playsInline
       preload="auto"
       aria-hidden="true"
-      className="animate-fade-in h-full w-full object-cover"
+      className={cn("h-full w-full object-cover", fadeIn && "animate-fade-in")}
     >
       <source src={src} type="video/mp4" />
     </video>
