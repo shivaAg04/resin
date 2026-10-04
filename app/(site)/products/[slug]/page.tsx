@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ImageGallery } from "@/components/products/ImageGallery";
 import { BuyNowPanel } from "@/components/products/BuyNowPanel";
 import { ProductImage } from "@/components/products/ProductImage";
 import { ReviewsCarousel } from "@/components/products/ReviewsCarousel";
-import { InstagramEmbed, processInstagramEmbeds } from "@/components/InstagramEmbed";
+import { InstagramEmbed } from "@/components/InstagramEmbed";
+import { InstagramEmbedsLoader } from "@/components/InstagramEmbedsLoader";
 import { Badge } from "@/components/ui/Badge";
 import {
   getActiveProducts,
@@ -125,8 +125,7 @@ export default async function ProductDetailPage(props: PageProps<"/products/[slu
           )}
 
           {reels.length > 0 && (
-            <div className="border-t border-border-soft/70 pt-6">
-              <Script src="https://www.instagram.com/embed.js" strategy="lazyOnload" onLoad={processInstagramEmbeds} />
+            <InstagramEmbedsLoader className="border-t border-border-soft/70 pt-6">
               <h2 className="mb-3 font-display text-lg font-semibold text-ink">See it in action</h2>
               {reels.length === 1 ? (
                 <div className="max-w-sm">
@@ -141,7 +140,7 @@ export default async function ProductDetailPage(props: PageProps<"/products/[slu
                   ))}
                 </div>
               )}
-            </div>
+            </InstagramEmbedsLoader>
           )}
         </div>
       </div>

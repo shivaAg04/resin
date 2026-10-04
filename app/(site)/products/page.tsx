@@ -7,7 +7,7 @@ import { getActiveCategories, getActiveProducts } from "@/lib/data/products";
 
 export const metadata: Metadata = {
   title: "Shop All Products",
-  description: "Browse our full collection of handmade resin rodcuts and custom pieces.",
+  description: "Browse our full collection of handmade resin products and custom pieces.",
 };
 
 export default async function ProductsPage(props: PageProps<"/products">) {

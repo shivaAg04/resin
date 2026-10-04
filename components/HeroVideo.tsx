@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 const MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
@@ -45,6 +45,21 @@ function getSaveDataServerSnapshot() {
   return false;
 }
 
+/** True once the window `load` event has fired (immediately if it already has). */
+function usePageLoaded(): boolean {
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    const markLoaded = () => setLoaded(true);
+    if (document.readyState === "complete") {
+      const id = window.setTimeout(markLoaded, 0);
+      return () => window.clearTimeout(id);
+    }
+    window.addEventListener("load", markLoaded, { once: true });
+    return () => window.removeEventListener("load", markLoaded);
+  }, []);
+  return loaded;
+}
+
 /**
  * Skips the autoplaying background video for reduced-motion users and for
  * anyone on Data Saver / a slow connection — most of this site's traffic is
@@ -55,7 +70,11 @@ export function HeroVideo({ src }: { src: string }) {
   const reducedMotion = useSyncExternalStore(subscribeMotion, getMotionSnapshot, getMotionServerSnapshot);
   const saveData = useSyncExternalStore(subscribeSaveData, getSaveDataSnapshot, getSaveDataServerSnapshot);
 
-  if (reducedMotion || saveData) return null;
+  const pageLoaded = usePageLoaded();
+
+  // Mount the video only after the page's own images and scripts have
+  // finished loading, so this ~2.6MB download never competes with them.
+  if (reducedMotion || saveData || !pageLoaded) return null;
 
   return (
     <video
@@ -65,7 +84,7 @@ export function HeroVideo({ src }: { src: string }) {
       playsInline
       preload="auto"
       aria-hidden="true"
-      className="h-full w-full object-cover"
+      className="animate-fade-in h-full w-full object-cover"
     >
       <source src={src} type="video/mp4" />
     </video>

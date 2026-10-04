@@ -22,10 +22,10 @@ export const metadata: Metadata = {
     template: "%s | Spilled Colours",
   },
   description:
-    "Handmade resin rodcuts and custom pieces, cast and finished by hand. Shop the collection and order directly — no account needed.",
+    "Handmade resin products and custom pieces, cast and finished by hand. Shop the collection and order directly — no account needed.",
   openGraph: {
     title: "Spilled Colours | Handmade Resin Art",
-    description: "Handmade resin rodcuts and custom pieces, cast and finished by hand.",
+    description: "Handmade resin products and custom pieces, cast and finished by hand.",
     siteName: "Spilled Colours",
     type: "website",
   },
