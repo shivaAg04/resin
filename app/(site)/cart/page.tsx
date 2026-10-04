@@ -6,7 +6,7 @@ import { ProductImage } from "@/components/products/ProductImage";
 import { QuantitySelector } from "@/components/products/QuantitySelector";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { formatPrice } from "@/lib/utils/format";
-import { MAX_ORDER_QUANTITY } from "@/lib/utils/validation";
+import { MAX_ORDER_QUANTITY } from "@/lib/utils/order-limits";
 import { useCart } from "@/lib/cart/context";
 
 export default function CartPage() {

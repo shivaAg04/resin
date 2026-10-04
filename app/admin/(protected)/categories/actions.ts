@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { revalidateCatalog } from "@/lib/cache/catalog";
 import {
   createCategory,
   deleteCategory,
@@ -14,6 +15,7 @@ function revalidateCategoryPages() {
   revalidatePath("/admin/categories");
   revalidatePath("/admin/products");
   revalidatePath("/products");
+  revalidateCatalog();
   revalidatePath("/");
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { MAX_ORDER_QUANTITY } from "@/lib/utils/validation";
+import { MAX_ORDER_QUANTITY } from "@/lib/utils/order-limits";
 
 export interface CartItem {
   productSlug: string;

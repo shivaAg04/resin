@@ -5,6 +5,8 @@ const supabaseHostname = supabaseUrl ? new URL(supabaseUrl).hostname : undefined
 
 const nextConfig: NextConfig = {
   images: {
+    // AVIF is ~30-50% smaller than WebP; browsers without it still get WebP.
+    formats: ["image/avif", "image/webp"],
     qualities: [65, 75, 90],
     remotePatterns: [
       ...(supabaseHostname

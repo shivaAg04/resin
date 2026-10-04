@@ -7,7 +7,7 @@ import { QuantitySelector } from "@/components/products/QuantitySelector";
 import { AddToCartButton } from "@/components/products/AddToCartButton";
 import { Button } from "@/components/ui/Button";
 import { formatPrice } from "@/lib/utils/format";
-import { MAX_ORDER_QUANTITY } from "@/lib/utils/validation";
+import { MAX_ORDER_QUANTITY } from "@/lib/utils/order-limits";
 
 interface BuyNowPanelProps {
   slug: string;

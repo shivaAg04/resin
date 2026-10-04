@@ -7,7 +7,8 @@ export function ProductImage({
   src,
   alt,
   className,
-  sizes = "(min-width: 768px) 33vw, 50vw",
+  // Matches the 2-col (mobile) / 4-col (lg, capped at max-w-6xl) product grids.
+  sizes = "(min-width: 1152px) 270px, (min-width: 1024px) 25vw, 50vw",
   preload = false,
 }: {
   src: string | undefined;

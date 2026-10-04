@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { createPublicClient } from "@/lib/supabase/public";
+import { createCachedPublicClient, createPublicClient } from "@/lib/supabase/public";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MOCK_PRODUCTS } from "@/lib/data/mock-products";
 import { normalizeReelUrl } from "@/lib/utils/instagram";
@@ -105,7 +105,7 @@ export async function getActiveProducts(options?: { categorySlug?: string; searc
   }
 
   try {
-    const supabase = createPublicClient();
+    const supabase = createCachedPublicClient();
 
     const { data, error } = await (options?.categorySlug
       ? supabase
@@ -142,7 +142,7 @@ async function searchActiveProducts(query: string, categorySlug?: string): Promi
   const term = `%${query}%`;
 
   try {
-    const supabase = createPublicClient();
+    const supabase = createCachedPublicClient();
 
     if (categorySlug) {
       // Already scoped to one category — no category-vs-title priority to resolve.
@@ -242,7 +242,7 @@ export async function getProductsByCategoryForHome(categorySlug: string, limit =
 /** Categories currently tagged on at least one active product — for the public filter bar. */
 export async function getActiveCategories(): Promise<Category[]> {
   try {
-    const supabase = createPublicClient();
+    const supabase = createCachedPublicClient();
     const { data, error } = await supabase
       .from("categories")
       .select("*, product_categories!inner(products!inner(is_active))")

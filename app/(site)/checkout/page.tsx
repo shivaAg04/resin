@@ -5,7 +5,7 @@ import { CheckoutForm } from "@/components/checkout/CheckoutForm";
 import { CartCheckout } from "@/components/checkout/CartCheckout";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { getProductBySlug } from "@/lib/data/products";
-import { MAX_ORDER_QUANTITY } from "@/lib/utils/validation";
+import { MAX_ORDER_QUANTITY } from "@/lib/utils/order-limits";
 
 export const metadata: Metadata = {
   title: "Checkout",

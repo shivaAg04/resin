@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { revalidateCatalog } from "@/lib/cache/catalog";
 import { redirect } from "next/navigation";
 import {
   createProduct,
@@ -26,6 +27,7 @@ export async function createProductAction(input: ProductInput): Promise<{ error?
 
   revalidatePath("/admin/products");
   revalidatePath("/products");
+  revalidateCatalog();
   revalidatePath("/");
   redirect("/admin/products");
 }
@@ -36,6 +38,7 @@ export async function updateProductAction(id: string, input: ProductInput): Prom
 
   revalidatePath("/admin/products");
   revalidatePath("/products");
+  revalidateCatalog();
   revalidatePath(`/products/${product.slug}`);
   revalidatePath("/");
   await revalidateContainingBundles(id);
@@ -52,6 +55,7 @@ export async function deleteProductAction(formData: FormData): Promise<void> {
   await deleteProduct(id);
   revalidatePath("/admin/products");
   revalidatePath("/products");
+  revalidateCatalog();
   revalidatePath("/");
   if (product) revalidatePath(`/products/${product.slug}`);
 }
@@ -62,6 +66,7 @@ export async function toggleProductActiveAction(formData: FormData): Promise<voi
   await setProductActive(id, nextActive);
   revalidatePath("/admin/products");
   revalidatePath("/products");
+  revalidateCatalog();
   revalidatePath("/");
   const product = await getProductByIdAdmin(id);
   if (product) revalidatePath(`/products/${product.slug}`);
@@ -74,6 +79,7 @@ export async function moveProductSortOrderAction(formData: FormData): Promise<vo
   await moveProductSortOrder(id, direction);
   revalidatePath("/admin/products");
   revalidatePath("/products");
+  revalidateCatalog();
   revalidatePath("/");
 }
 
@@ -84,5 +90,6 @@ export async function setProductSortOrderAction(formData: FormData): Promise<voi
   await setProductSortOrder(id, value);
   revalidatePath("/admin/products");
   revalidatePath("/products");
+  revalidateCatalog();
   revalidatePath("/");
 }

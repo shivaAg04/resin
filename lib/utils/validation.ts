@@ -1,7 +1,9 @@
 import { z } from "zod";
 
 /** No stock tracking — this is just a sane ceiling on a single order's quantity. */
-export const MAX_ORDER_QUANTITY = 20;
+import { MAX_ORDER_QUANTITY } from "@/lib/utils/order-limits";
+
+export { MAX_ORDER_QUANTITY };
 
 /** Normalizes a loosely-formatted Indian mobile number to 10 bare digits. */
 export function normalizeIndianMobile(raw: string): string {
