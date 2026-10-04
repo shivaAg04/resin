@@ -612,3 +612,16 @@ export function getDisplayReelsForProduct(product: Product): DisplayReel[] {
 
   return reels;
 }
+
+/**
+ * Photos for a product's gallery. For a bundle, the bundle's own photos
+ * come first, then every component product's photos in bundle order —
+ * duplicates dropped — so a hamper shows what's inside it.
+ */
+export function getGalleryImagesForProduct(product: Product): string[] {
+  const images = new Set(product.images ?? []);
+  for (const item of product.bundle_items) {
+    for (const image of item.images ?? []) images.add(image);
+  }
+  return [...images];
+}

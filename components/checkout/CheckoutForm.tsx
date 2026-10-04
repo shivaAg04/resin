@@ -3,12 +3,11 @@
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { AlertCircle, CreditCard, Loader2, MessageCircle } from "lucide-react";
+import { AlertCircle, CreditCard, Loader2 } from "lucide-react";
 import { OrderSummary } from "@/components/checkout/OrderSummary";
 import { QuantitySelector } from "@/components/products/QuantitySelector";
 import { Button } from "@/components/ui/Button";
 import { FieldWrapper, Input, Textarea } from "@/components/ui/Field";
-import { cn } from "@/lib/utils/format";
 import { customerDetailsSchema, MAX_ORDER_QUANTITY, type CustomerDetailsInput } from "@/lib/utils/validation";
 import { useCart } from "@/lib/cart/context";
 
@@ -105,7 +104,6 @@ export function CheckoutForm({ single }: CheckoutFormProps) {
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<"cod" | "online">("cod");
 
   const checkoutItems = single
     ? [
@@ -142,25 +140,6 @@ export function CheckoutForm({ single }: CheckoutFormProps) {
 
   function itemsPayload() {
     return checkoutItems.map(({ productSlug, quantity }) => ({ productSlug, quantity }));
-  }
-
-  async function placeCodOrder(parsedForm: CustomerDetailsInput) {
-    const response = await fetch("/api/orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...parsedForm, items: itemsPayload() }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      setSubmitError(data.error ?? "Something went wrong. Please try again.");
-      setSubmitting(false);
-      return;
-    }
-
-    if (!single) cart.clear();
-    router.push(`/order-success/${data.orderNumber}?d=${data.confirmation}`);
   }
 
   async function payOnline(parsedForm: CustomerDetailsInput) {
@@ -231,6 +210,7 @@ export function CheckoutForm({ single }: CheckoutFormProps) {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitError(null);
+    if (!RAZORPAY_KEY_ID) return;
 
     const parsed = customerDetailsSchema.safeParse(form);
     if (!parsed.success) {
@@ -246,11 +226,7 @@ export function CheckoutForm({ single }: CheckoutFormProps) {
     setSubmitting(true);
 
     try {
-      if (paymentMethod === "online") {
-        await payOnline(parsed.data);
-      } else {
-        await placeCodOrder(parsed.data);
-      }
+      await payOnline(parsed.data);
     } catch {
       setSubmitError("Network error — please check your connection and try again.");
       setSubmitting(false);
@@ -368,42 +344,22 @@ export function CheckoutForm({ single }: CheckoutFormProps) {
           </div>
         </div>
 
-        {RAZORPAY_KEY_ID && (
-          <div className="border-t border-border-soft/70 pt-5">
-            <h2 className="font-display text-lg font-semibold text-ink">Payment</h2>
-            <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <button
-                type="button"
-                onClick={() => setPaymentMethod("cod")}
-                className={cn(
-                  "flex items-center gap-3 rounded-xl border p-3 text-left transition-colors",
-                  paymentMethod === "cod" ? "border-amber bg-amber-light/40" : "border-border-soft/70 hover:border-ink/20",
-                )}
-              >
-                <MessageCircle className="h-5 w-5 shrink-0 text-ink-soft" />
-                <span>
-                  <span className="block text-sm font-medium text-ink">WhatsApp / Cash on Delivery</span>
-                  <span className="block text-xs text-ink-soft">We&apos;ll confirm your order on WhatsApp</span>
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setPaymentMethod("online")}
-                className={cn(
-                  "flex items-center gap-3 rounded-xl border p-3 text-left transition-colors",
-                  paymentMethod === "online" ? "border-amber bg-amber-light/40" : "border-border-soft/70 hover:border-ink/20",
-                )}
-              >
-                <CreditCard className="h-5 w-5 shrink-0 text-ink-soft" />
-                <span>
-                  <span className="block text-sm font-medium text-ink">Pay Online Now</span>
-                  <span className="block text-xs text-ink-soft">UPI, cards, netbanking</span>
-                </span>
-              </button>
+        <div className="border-t border-border-soft/70 pt-5">
+          <h2 className="font-display text-lg font-semibold text-ink">Payment</h2>
+          {RAZORPAY_KEY_ID ? (
+            <div className="mt-3 flex items-center gap-3 rounded-xl border border-amber bg-amber-light/40 p-3">
+              <CreditCard className="h-5 w-5 shrink-0 text-ink-soft" />
+              <span>
+                <span className="block text-sm font-medium text-ink">Pay securely online</span>
+                <span className="block text-xs text-ink-soft">UPI, cards, net banking and wallets, via Razorpay</span>
+              </span>
             </div>
-          </div>
-        )}
+          ) : (
+            <p role="alert" className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+              Online payment is temporarily unavailable. Please message us on WhatsApp to place your order.
+            </p>
+          )}
+        </div>
 
         {submitError && (
           <div role="alert" className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
@@ -428,15 +384,9 @@ export function CheckoutForm({ single }: CheckoutFormProps) {
           .
         </p>
 
-        <Button type="submit" size="lg" disabled={submitting} className="w-full sm:w-auto">
+        <Button type="submit" size="lg" disabled={submitting || !RAZORPAY_KEY_ID} className="w-full sm:w-auto">
           {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-          {submitting
-            ? paymentMethod === "online"
-              ? "Opening payment..."
-              : "Placing order..."
-            : paymentMethod === "online"
-              ? "Proceed to Pay"
-              : "Place Order"}
+          {submitting ? "Opening payment..." : "Proceed to Pay"}
         </Button>
       </form>
 

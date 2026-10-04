@@ -64,7 +64,7 @@ export default async function OrderSuccessPage(props: PageProps<"/order-success/
       )}
 
       <p className="mt-6 text-sm text-ink-soft">
-        We&apos;ll reach out on WhatsApp to confirm your order and delivery details.
+        Payment received. We&apos;ll message you on WhatsApp with delivery and tracking updates.
       </p>
 
       <div className="mt-6 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">

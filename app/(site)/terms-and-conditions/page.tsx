@@ -32,8 +32,8 @@ export default function TermsPage() {
         <ul>
           <li>All prices are in Indian Rupees (INR) and include applicable taxes unless stated otherwise.</li>
           <li>
-            You can pay online (UPI, cards, net banking, wallets) through our payment partner Razorpay, or choose
-            Cash on Delivery / confirm on WhatsApp where available.
+            All orders are prepaid. You pay online (UPI, cards, net banking or wallets) through our payment
+            partner Razorpay. We do not offer Cash on Delivery.
           </li>
           <li>
             We do not store your card, UPI or bank details. Online payments are processed securely by Razorpay.
@@ -44,9 +44,8 @@ export default function TermsPage() {
 
       <PolicySection heading="Orders">
         <p>
-          An order is confirmed once we receive payment (for online orders) or confirm it with you on WhatsApp (for
-          COD orders). We may refuse or cancel an order if an item is unavailable, the pricing was clearly wrong,
-          or the order looks fraudulent. If we cancel a prepaid order, you get a full refund.
+          An order is confirmed once we receive your payment. We may refuse or cancel an order if an item is
+          unavailable, the pricing was clearly wrong, or the order looks fraudulent. If we cancel a prepaid order, you get a full refund.
         </p>
       </PolicySection>
 

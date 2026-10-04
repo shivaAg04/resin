@@ -8,7 +8,12 @@ import { ProductImage } from "@/components/products/ProductImage";
 import { ReviewsCarousel } from "@/components/products/ReviewsCarousel";
 import { InstagramEmbed, processInstagramEmbeds } from "@/components/InstagramEmbed";
 import { Badge } from "@/components/ui/Badge";
-import { getActiveProducts, getDisplayReelsForProduct, getProductBySlug } from "@/lib/data/products";
+import {
+  getActiveProducts,
+  getDisplayReelsForProduct,
+  getGalleryImagesForProduct,
+  getProductBySlug,
+} from "@/lib/data/products";
 import { getReviewsForProductPage } from "@/lib/data/reviews";
 import { formatPrice } from "@/lib/utils/format";
 
@@ -27,6 +32,7 @@ export async function generateMetadata(props: PageProps<"/products/[slug]">): Pr
   const product = await getProductBySlug(slug);
 
   if (!product) return { title: "Product not found" };
+  const shareImage = getGalleryImagesForProduct(product)[0];
 
   return {
     title: product.name,
@@ -34,7 +40,7 @@ export async function generateMetadata(props: PageProps<"/products/[slug]">): Pr
     openGraph: {
       title: product.name,
       description: product.description ?? undefined,
-      images: product.images?.[0] ? [{ url: product.images[0] }] : undefined,
+      images: shareImage ? [{ url: shareImage }] : undefined,
     },
   };
 }
@@ -57,7 +63,7 @@ export default async function ProductDetailPage(props: PageProps<"/products/[slu
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
-        <ImageGallery images={product.images ?? []} alt={product.name} />
+        <ImageGallery images={getGalleryImagesForProduct(product)} alt={product.name} />
 
         <div className="flex flex-col gap-5">
           {product.categories.length > 0 && (

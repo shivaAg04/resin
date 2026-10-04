@@ -53,7 +53,6 @@ export default function RefundPolicyPage() {
             Refunds usually reach you within <strong>{POLICY.refundDays} business days</strong> after approval,
             depending on your bank.
           </li>
-          <li>For Cash on Delivery orders, we refund to a UPI ID or bank account you share with us.</li>
           <li>If we cancel your order for any reason, you get a full refund.</li>
         </ul>
       </PolicySection>
