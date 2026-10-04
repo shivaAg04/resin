@@ -37,7 +37,7 @@ function getSaveDataSnapshot() {
   const connection = getConnection();
   if (!connection) return false;
   // Also skip the video on slow connections, not just explicit Data Saver —
-  // this is a ~2.6MB autoplaying file, not worth it on 2G/3G.
+  // this is a ~650KB autoplaying file, not worth it on 2G.
   return Boolean(connection.saveData) || connection.effectiveType === "slow-2g" || connection.effectiveType === "2g";
 }
 
@@ -73,7 +73,7 @@ export function HeroVideo({ src }: { src: string }) {
   const pageLoaded = usePageLoaded();
 
   // Mount the video only after the page's own images and scripts have
-  // finished loading, so this ~2.6MB download never competes with them.
+  // finished loading, so this ~650KB download never competes with them.
   if (reducedMotion || saveData || !pageLoaded) return null;
 
   return (
