@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Camera, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { PolicyPage } from "@/components/legal/PolicyPage";
 import { BUSINESS, getDisplayPhone } from "@/lib/legal";
@@ -60,7 +61,10 @@ export default function ContactUsPage() {
         </dl>
       </div>
 
-      <p className="text-sm">Support hours: Monday to Saturday, 10 AM to 7 PM IST.</p>
+      <p className="text-sm">Support hours: {BUSINESS.supportHours}.</p>
+      <p className="text-sm">
+        Ordering in bulk? Use our <Link href="/bulk-orders">bulk order form</Link>.
+      </p>
     </PolicyPage>
   );
 }

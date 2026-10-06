@@ -3,14 +3,14 @@ import Image from "next/image";
 import { Camera, Globe, Mail, MessageCircle, Users } from "lucide-react";
 import { buildGenericWhatsAppUrl } from "@/lib/whatsapp";
 import { getActiveCategories } from "@/lib/data/products";
-import { POLICY_LINKS } from "@/lib/legal";
+import { BUSINESS, POLICY_LINKS } from "@/lib/legal";
 
 export async function SiteFooter() {
   const instagramUrl = process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? "#";
   const whatsappUrl = buildGenericWhatsAppUrl();
   const facebookUrl = process.env.NEXT_PUBLIC_FACEBOOK_URL;
   const communityUrl = process.env.NEXT_PUBLIC_WHATSAPP_COMMUNITY_URL;
-  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL;
+  const contactEmail = BUSINESS.email;
   const categories = await getActiveCategories();
 
   return (
@@ -36,6 +36,9 @@ export async function SiteFooter() {
             <span className="font-display text-base font-semibold text-ink">Shop</span>
             <Link href="/products" className="text-ink-soft transition-colors hover:text-ink">
               All Products
+            </Link>
+            <Link href="/bulk-orders" className="text-ink-soft transition-colors hover:text-ink">
+              Bulk Orders
             </Link>
             {categories.slice(0, 5).map((category) => (
               <Link
@@ -94,9 +97,6 @@ export async function SiteFooter() {
                 <Mail className="h-4 w-4" /> {contactEmail}
               </a>
             )}
-            <Link href="/admin/login" className="text-xs text-ink-soft/60 transition-colors hover:text-ink-soft">
-              Admin login
-            </Link>
           </div>
         </div>
 
@@ -113,7 +113,7 @@ export async function SiteFooter() {
 
         <div className="mt-4 flex flex-col gap-2 border-border-soft/70 pt-6 text-xs text-ink-soft/70 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} Spilled Colours. All rights reserved.</p>
-          <p>Handmade with love, shipped across India.</p>
+          <p>Handmade with love, shipped worldwide.</p>
         </div>
       </div>
     </footer>

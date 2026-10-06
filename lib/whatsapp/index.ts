@@ -10,9 +10,15 @@ export function buildWhatsAppUrl(phone: string, message: string): string {
   return `https://wa.me/${digitsOnly(phone)}?${params.toString()}`;
 }
 
-/** Business WhatsApp number, from env, in international-digits form (e.g. 919876543210). */
+/**
+ * Business WhatsApp (and phone) number in international-digits form. Kept
+ * in code rather than an env var: it's public anyway, and a stale env
+ * value in Vercel once left every WhatsApp button pointing at a placeholder.
+ */
+export const BUSINESS_WHATSAPP_NUMBER = "917451011567";
+
 export function getBusinessWhatsAppNumber(): string {
-  return digitsOnly(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "");
+  return BUSINESS_WHATSAPP_NUMBER;
 }
 
 export function buildGenericWhatsAppUrl(message = "Hi! I'd like to know more about your resin products."): string {

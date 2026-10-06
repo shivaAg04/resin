@@ -13,15 +13,16 @@ export const BUSINESS = {
   legalName: process.env.NEXT_PUBLIC_BUSINESS_LEGAL_NAME ?? "",
   /** Full postal address, one line. */
   address: process.env.NEXT_PUBLIC_BUSINESS_ADDRESS ?? "",
-  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "",
+  email: "spilled.colours.sc@gmail.com",
   jurisdictionCity: process.env.NEXT_PUBLIC_BUSINESS_CITY ?? "",
-  lastUpdated: "1 October 2026",
+  lastUpdated: "6 October 2026",
+  supportHours: "Monday to Saturday, 12 PM to 7 PM IST",
 } as const;
 
 export const POLICY = {
-  /** Business days to make and dispatch an order. */
-  dispatchDays: "3–7",
-  /** Business days for the courier to deliver after dispatch. */
+  /** Days to make and dispatch an order. */
+  turnaroundDays: "15–20",
+  /** Business days for the courier to deliver within India after dispatch. */
   deliveryDays: "4–8",
   /** Hours after delivery within which damage must be reported. */
   damageReportHours: 48,

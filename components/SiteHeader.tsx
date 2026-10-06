@@ -9,9 +9,12 @@ export function SiteHeader() {
         <Link href="/" className="flex items-center">
           <Image src="/logo.png" alt="Spilled Colours" width={158} height={54} className="h-9 w-auto" preload />
         </Link>
-        <nav className="flex items-center gap-6 text-sm font-medium">
+        <nav className="flex items-center gap-4 text-sm font-medium sm:gap-6">
           <Link href="/products" className="text-ink-soft transition-colors hover:text-ink">
             Shop
+          </Link>
+          <Link href="/bulk-orders" className="text-ink-soft transition-colors hover:text-ink">
+            Bulk Orders
           </Link>
           <CartIcon />
         </nav>

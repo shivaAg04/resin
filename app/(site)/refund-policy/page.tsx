@@ -12,14 +12,9 @@ export default function RefundPolicyPage() {
       intro="Every piece is handmade, often to order, so this policy is a little different from a regular store. Please read it before you buy."
     >
       <PolicySection heading="Cancellations">
-        <ul>
-          <li>
-            You can cancel your order for free <strong>before it is dispatched</strong>. Message us on WhatsApp with
-            your order number.
-          </li>
-          <li>Once an order has been dispatched, it can no longer be cancelled.</li>
-          <li>Custom or personalised orders cannot be cancelled once you approve the design.</li>
-        </ul>
+        <p>
+          Cancellations are <strong>not allowed once your order is in process</strong>, under any circumstances.
+        </p>
       </PolicySection>
 
       <PolicySection heading="Returns">
@@ -29,21 +24,30 @@ export default function RefundPolicyPage() {
         </p>
       </PolicySection>
 
-      <PolicySection heading="Damaged, defective or wrong items">
+      <PolicySection heading="Defective or Wrong Items">
         <p>
-          If your order arrives damaged, defective or is not what you ordered, we will replace it or give you a
-          refund. To claim:
+          If you receive the wrong item, or an item with a defect in how we made it, we will replace it or give
+          you a refund. To claim:
         </p>
         <ul>
           <li>
             Contact us within <strong>{POLICY.damageReportHours} hours of delivery</strong> with your order number.
           </li>
           <li>
-            Send a clear <strong>unboxing video</strong> and photos of the damage. We cannot accept claims without
-            an unboxing video.
+            Send an <strong>uncut unboxing video, from start to end</strong>, and photos of the issue. We cannot
+            accept claims without it.
           </li>
           <li>Keep the item and packaging until we resolve your claim.</li>
         </ul>
+      </PolicySection>
+
+      <PolicySection heading="Damage During Transit">
+        <p>
+          We share photos and videos of every product before dispatch and pack each piece carefully, but we are
+          not responsible for damage or delay caused by the courier. We will still try to help find a solution,
+          for which an uncut unboxing video is required. See our{" "}
+          <Link href="/shipping-policy">Shipping Policy</Link>.
+        </p>
       </PolicySection>
 
       <PolicySection heading="Refunds">

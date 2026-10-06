@@ -45,7 +45,8 @@ export default function TermsPage() {
       <PolicySection heading="Orders">
         <p>
           An order is confirmed once we receive your payment. We may refuse or cancel an order if an item is
-          unavailable, the pricing was clearly wrong, or the order looks fraudulent. If we cancel a prepaid order, you get a full refund.
+          unavailable, the pricing was clearly wrong, or the order looks fraudulent. If we cancel a prepaid order,
+          you get a full refund.
         </p>
       </PolicySection>
 
@@ -65,8 +66,8 @@ export default function TermsPage() {
 
       <PolicySection heading="Limitation of liability">
         <p>
-          Our products are decorative and should be used as described. Resin items are not heat-proof or food-safe
-          unless we say so explicitly. Our liability for any order is limited to the amount you paid for that order.
+          Our products are decorative and should be used as described. Our liability for any order is limited to
+          the amount you paid for that order.
         </p>
       </PolicySection>
 

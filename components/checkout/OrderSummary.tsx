@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ProductImage } from "@/components/products/ProductImage";
 import { formatPrice } from "@/lib/utils/format";
 
@@ -40,6 +41,13 @@ export function OrderSummary({ items }: { items: OrderSummaryItem[] }) {
           <dd className="tabular-nums">{formatPrice(subtotal)}</dd>
         </div>
       </dl>
+      <p className="mt-3 text-xs leading-relaxed text-ink-soft">
+        Shipping charges are not included. We&apos;ll share them on WhatsApp after you order, based on parcel
+        weight and your location.{" "}
+        <Link href="/shipping-policy" className="underline hover:text-ink">
+          Shipping policy
+        </Link>
+      </p>
     </div>
   );
 }
