@@ -26,14 +26,22 @@ export function BuyNowPanel({ slug, name, price, image }: BuyNowPanelProps) {
 
   return (
     <>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-        <QuantitySelector quantity={quantity} onChange={setQuantity} max={MAX_ORDER_QUANTITY} />
-        <div className="flex gap-3">
-          <AddToCartButton productSlug={slug} name={name} price={price} image={image} quantity={quantity} className="flex-1 sm:flex-none" />
-          <Button onClick={handleBuyNow} size="lg" className="flex-1 sm:flex-none">
-            Buy Now <ArrowRight className="h-4 w-4" />
-          </Button>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-ink-soft">Quantity</span>
+          <QuantitySelector quantity={quantity} onChange={setQuantity} max={MAX_ORDER_QUANTITY} />
         </div>
+        <Button onClick={handleBuyNow} size="lg" className="w-full text-xs uppercase tracking-[0.12em]">
+          Buy Now <ArrowRight className="h-4 w-4" />
+        </Button>
+        <AddToCartButton
+          productSlug={slug}
+          name={name}
+          price={price}
+          image={image}
+          quantity={quantity}
+          className="h-13 w-full text-xs uppercase tracking-[0.12em]"
+        />
       </div>
 
       {/* Sticky mobile CTA */}
@@ -43,11 +51,10 @@ export function BuyNowPanel({ slug, name, price, image }: BuyNowPanelProps) {
           <span className="font-display text-lg font-semibold">{formatPrice(price * quantity)}</span>
         </div>
         <QuantitySelector quantity={quantity} onChange={setQuantity} max={MAX_ORDER_QUANTITY} />
-        <Button onClick={handleBuyNow}>
+        <Button onClick={handleBuyNow} className="text-xs uppercase tracking-[0.12em]">
           Buy Now
         </Button>
       </div>
-      <div className="h-16 sm:hidden" aria-hidden />
     </>
   );
 }

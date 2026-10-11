@@ -13,6 +13,8 @@ import { useCart } from "@/lib/cart/context";
 
 const RAZORPAY_KEY_ID = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
 
+const sectionHeading = "font-display text-xl font-medium uppercase tracking-wide text-ink";
+
 interface RazorpaySuccessResponse {
   razorpay_payment_id: string;
   razorpay_order_id: string;
@@ -171,7 +173,7 @@ export function CheckoutForm({ single }: CheckoutFormProps) {
       description: orderDescription,
       order_id: created.razorpayOrderId,
       prefill: { name: created.customerName, contact: created.whatsappNumber },
-      theme: { color: "#ff8dc7" },
+      theme: { color: "#1f0352" },
       handler: async (response) => {
         try {
           const verifyResponse = await fetch("/api/payments/verify", {
@@ -238,7 +240,7 @@ export function CheckoutForm({ single }: CheckoutFormProps) {
       <form onSubmit={handleSubmit} noValidate className="order-2 flex flex-col gap-5 lg:order-1">
         {single && (
           <div>
-            <h2 className="font-display text-lg font-semibold text-ink">Quantity</h2>
+            <h2 className={sectionHeading}>Quantity</h2>
             <div className="mt-2">
               <QuantitySelector quantity={quantity} onChange={setQuantity} max={MAX_ORDER_QUANTITY} />
             </div>
@@ -246,7 +248,7 @@ export function CheckoutForm({ single }: CheckoutFormProps) {
         )}
 
         <div className="border-t border-border-soft/70 pt-5">
-          <h2 className="font-display text-lg font-semibold text-ink">Your Details</h2>
+          <h2 className={sectionHeading}>Delivery Details</h2>
 
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FieldWrapper label="Full Name" htmlFor="customerName" error={errors.customerName}>
@@ -345,9 +347,9 @@ export function CheckoutForm({ single }: CheckoutFormProps) {
         </div>
 
         <div className="border-t border-border-soft/70 pt-5">
-          <h2 className="font-display text-lg font-semibold text-ink">Payment</h2>
+          <h2 className={sectionHeading}>Payment</h2>
           {RAZORPAY_KEY_ID ? (
-            <div className="mt-3 flex items-center gap-3 rounded-xl border border-amber bg-amber-light/40 p-3">
+            <div className="mt-3 flex items-center gap-3 rounded-lg border border-ink/20 bg-lilac p-3">
               <CreditCard className="h-5 w-5 shrink-0 text-ink-soft" />
               <span>
                 <span className="block text-sm font-medium text-ink">Pay securely online</span>
@@ -384,7 +386,12 @@ export function CheckoutForm({ single }: CheckoutFormProps) {
           .
         </p>
 
-        <Button type="submit" size="lg" disabled={submitting || !RAZORPAY_KEY_ID} className="w-full sm:w-auto">
+        <Button
+          type="submit"
+          size="lg"
+          disabled={submitting || !RAZORPAY_KEY_ID}
+          className="w-full text-xs uppercase tracking-[0.12em] sm:w-auto"
+        >
           {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
           {submitting ? "Opening payment..." : "Proceed to Pay"}
         </Button>

@@ -56,6 +56,27 @@ export async function getActiveReviewsForProduct(productId: string): Promise<Pro
   }
 }
 
+export type ReviewWithProduct = ProductReview & { product: { name: string; slug: string } | null };
+
+/** Every active review on an active product, newest first — for the /reviews page. */
+export async function getAllActiveProductReviews(): Promise<ReviewWithProduct[]> {
+  try {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from("product_reviews")
+      .select("*, product:products!inner(name, slug, is_active)")
+      .eq("is_active", true)
+      .eq("product.is_active", true)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    return data as ReviewWithProduct[];
+  } catch (error) {
+    console.error("getAllActiveProductReviews error", error);
+    return [];
+  }
+}
+
 export async function getAllReviewsForProductAdmin(productId: string): Promise<ProductReview[]> {
   const supabase = await createClient();
   const { data, error } = await supabase

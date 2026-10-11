@@ -9,6 +9,7 @@ import { CategoryTagPicker } from "@/components/admin/CategoryTagPicker";
 import { BundleItemsPicker, type PickableProduct } from "@/components/admin/BundleItemsPicker";
 import { createProductAction, updateProductAction } from "@/app/admin/(protected)/products/actions";
 import { formatPrice } from "@/lib/utils/format";
+import { PRODUCT_BADGES } from "@/lib/products/badges";
 import type { Category, Product, ProductInput } from "@/types";
 
 export function ProductForm({
@@ -30,6 +31,10 @@ export function ProductForm({
   const [images, setImages] = useState<string[]>(product?.images ?? []);
   const [reelUrl, setReelUrl] = useState(product?.reel_url ?? "");
   const [bundleItemIds, setBundleItemIds] = useState<string[]>(product?.bundle_items.map((b) => b.product_id) ?? []);
+  const [isCustomisable, setIsCustomisable] = useState(product?.is_customisable ?? false);
+  const [showInNew, setShowInNew] = useState(product?.show_in_new ?? false);
+  const [badges, setBadges] = useState<string[]>(product?.badges ?? []);
+  const [whatsIncluded, setWhatsIncluded] = useState(product?.whats_included ?? "");
   const [discountAmount, setDiscountAmount] = useState(product?.discount_amount ? String(product.discount_amount) : "0");
 
   const pickableProducts = allProducts.filter((p) => p.id !== product?.id);
@@ -65,6 +70,10 @@ export function ProductForm({
       reelUrl: reelUrl.trim(),
       bundleItemIds,
       discountAmount: discountValue,
+      isCustomisable,
+      showInNew,
+      badges,
+      whatsIncluded: whatsIncluded.trim(),
     };
 
     setSubmitting(true);
@@ -122,6 +131,17 @@ export function ProductForm({
         />
       </FieldWrapper>
 
+      <FieldWrapper label="What's Included" htmlFor="whatsIncluded" optional>
+        <Textarea
+          id="whatsIncluded"
+          rows={3}
+          placeholder={"e.g. 1 nameplate (12\" × 6\")\nWall-mounting hooks\nGift box"}
+          value={whatsIncluded}
+          onChange={(e) => setWhatsIncluded(e.target.value)}
+        />
+        <p className="mt-1 text-xs text-ink-soft">One item per line. Shown in the product page&apos;s &quot;What&apos;s Included&quot; section.</p>
+      </FieldWrapper>
+
       <FieldWrapper label="Product Images" htmlFor="images">
         <ImageUploader images={images} onChange={setImages} />
       </FieldWrapper>
@@ -161,6 +181,64 @@ export function ProductForm({
           value={reelUrl}
           onChange={(e) => setReelUrl(e.target.value)}
         />
+      </FieldWrapper>
+
+      <div className="flex flex-col gap-2">
+        <label className="flex items-start gap-2 text-sm text-ink">
+          <input
+            type="checkbox"
+            checked={isCustomisable}
+            onChange={(e) => setIsCustomisable(e.target.checked)}
+            className="mt-0.5 h-4 w-4 accent-ink"
+          />
+          <span>
+            Customisable
+            <span className="block text-xs text-ink-soft">
+              Shows a &quot;Customisable&quot; badge and the price as &quot;₹… onwards&quot;.
+            </span>
+          </span>
+        </label>
+        <label className="flex items-start gap-2 text-sm text-ink">
+          <input
+            type="checkbox"
+            checked={showInNew}
+            onChange={(e) => setShowInNew(e.target.checked)}
+            className="mt-0.5 h-4 w-4 accent-ink"
+          />
+          <span>
+            Show in &quot;New at Spilled Colours&quot;
+            <span className="block text-xs text-ink-soft">
+              Picked products show first in that homepage section; the newest products fill the rest.
+            </span>
+          </span>
+        </label>
+      </div>
+
+      <FieldWrapper label="Badges" htmlFor="badges" optional>
+        <div className="flex flex-wrap gap-2">
+          {PRODUCT_BADGES.map((badge) => {
+            const selected = badges.includes(badge.value);
+            return (
+              <button
+                key={badge.value}
+                type="button"
+                aria-pressed={selected}
+                onClick={() =>
+                  setBadges((current) =>
+                    selected ? current.filter((b) => b !== badge.value) : [...current, badge.value],
+                  )
+                }
+                className={
+                  selected
+                    ? "rounded-full border border-ink bg-ink px-3 py-1.5 text-xs font-medium text-cream"
+                    : "rounded-full border border-border-soft px-3 py-1.5 text-xs font-medium text-ink-soft hover:border-ink/30"
+                }
+              >
+                {badge.label}
+              </button>
+            );
+          })}
+        </div>
       </FieldWrapper>
 
       <FieldWrapper label="Status" htmlFor="isActive">

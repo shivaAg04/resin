@@ -16,6 +16,9 @@ import {
 } from "@/lib/data/products";
 import { getReviewsForProductPage } from "@/lib/data/reviews";
 import { formatPrice } from "@/lib/utils/format";
+import { getProductBadgeLabels } from "@/lib/products/badges";
+import { ProductPrice } from "@/components/products/ProductCard";
+import { ProductFeatureTiles, ProductInfoSections } from "@/components/products/ProductInfoSections";
 
 // Prerenders every active product at build time so PDPs are served from
 // cache instead of hitting Supabase on every visit. New/edited products
@@ -59,58 +62,96 @@ export default async function ProductDetailPage(props: PageProps<"/products/[slu
     0,
   );
   const bundleSavings = product.bundle_items.length > 0 ? Math.max(0, bundleSubtotal - Number(product.price)) : 0;
+  const badgeLabels = getProductBadgeLabels(product);
 
+  // Extra bottom padding on mobile clears BuyNowPanel's sticky Buy Now bar.
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
-        <ImageGallery images={getGalleryImagesForProduct(product)} alt={product.name} />
+    <div className="mx-auto max-w-6xl px-4 pb-24 pt-8 sm:px-6 sm:py-12">
+      <nav aria-label="Breadcrumb" className="mb-6 flex flex-wrap items-center gap-1.5 text-xs text-ink-soft">
+        <Link href="/" className="hover:text-ink">
+          Home
+        </Link>
+        <span aria-hidden="true">/</span>
+        {product.categories[0] ? (
+          <Link href={`/products?category=${product.categories[0].slug}`} className="hover:text-ink">
+            {product.categories[0].name}
+          </Link>
+        ) : (
+          <Link href="/products" className="hover:text-ink">
+            Shop
+          </Link>
+        )}
+        <span aria-hidden="true">/</span>
+        <span className="text-ink">{product.name}</span>
+      </nav>
 
-        <div className="flex flex-col gap-5">
-          {product.categories.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2">
-              {product.categories.map((category) => (
-                <Badge key={category.id}>{category.name}</Badge>
-              ))}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
+        <div className="lg:sticky lg:top-24 lg:self-start">
+          <ImageGallery images={getGalleryImagesForProduct(product)} alt={product.name} />
+        </div>
+
+        <div className="flex flex-col gap-6">
+          <div>
+            <h1 className="font-display text-3xl font-medium leading-tight text-ink sm:text-4xl">{product.name}</h1>
+            <div className="mt-2 flex flex-wrap items-baseline gap-2">
+              <ProductPrice product={product} className="font-display text-2xl font-semibold text-amber-dark" />
+              {bundleSavings > 0 && (
+                <>
+                  <span className="text-base text-ink-soft/60 line-through">{formatPrice(bundleSubtotal)}</span>
+                  <Badge className="border-green-200 bg-green-50 text-green-700">Save {formatPrice(bundleSavings)}</Badge>
+                </>
+              )}
             </div>
-          )}
-
-          <h1 className="font-display text-3xl font-semibold text-ink sm:text-4xl">{product.name}</h1>
-          <div className="flex flex-wrap items-baseline gap-2">
-            <p className="font-display text-2xl font-medium text-amber-dark">{formatPrice(product.price)}</p>
-            {bundleSavings > 0 && (
-              <>
-                <span className="text-base text-ink-soft/60 line-through">{formatPrice(bundleSubtotal)}</span>
-                <Badge className="border-green-200 bg-green-50 text-green-700">
-                  Save {formatPrice(bundleSavings)}
-                </Badge>
-              </>
+            {badgeLabels.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {badgeLabels.map((label) => (
+                  <span
+                    key={label}
+                    className="rounded-full bg-lilac px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-amber-dark"
+                  >
+                    {label}
+                  </span>
+                ))}
+              </div>
+            )}
+            {product.description && (
+              <p className="mt-4 line-clamp-4 text-[15px] leading-relaxed text-ink-soft">{product.description}</p>
             )}
           </div>
 
-          {product.description && (
-            <p className="text-base leading-relaxed text-ink-soft">{product.description}</p>
-          )}
+          <ProductFeatureTiles product={product} />
 
-          <div className="mt-2 border-t border-border-soft/70 pt-6">
+          <div>
             <BuyNowPanel
               slug={product.slug}
               name={product.name}
               price={Number(product.price)}
               image={product.images?.[0]}
             />
+            <p className="mt-4 text-sm text-ink-soft">
+              Want this in a different colour, size or style?{" "}
+              <Link
+                href="/custom-orders"
+                className="font-medium text-ink underline underline-offset-2 hover:text-amber-dark"
+              >
+                Send us your reference
+              </Link>
+            </p>
           </div>
 
+          <ProductInfoSections product={product} />
+
           {product.bundle_items.length > 0 && (
-            <div className="border-t border-border-soft/70 pt-6">
+            <div>
               <h2 className="mb-3 font-display text-lg font-semibold text-ink">This Bundle Includes</h2>
               <div className="flex flex-col gap-2">
                 {product.bundle_items.map((item) => (
                   <Link
                     key={item.product_id}
                     href={`/products/${item.slug}`}
-                    className="flex items-center gap-3 rounded-xl border border-border-soft/70 bg-white p-2.5 transition-colors hover:border-amber/40"
+                    className="flex items-center gap-3 rounded-lg border border-border-soft/70 bg-white p-2.5 transition-colors hover:border-ink/20"
                   >
-                    <ProductImage src={item.images?.[0]} alt={item.name} className="h-12 w-12 shrink-0 rounded-lg" />
+                    <ProductImage src={item.images?.[0]} alt={item.name} className="h-12 w-12 shrink-0 rounded-md" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-ink">{item.name}</p>
                       <p className="text-xs text-ink-soft">
@@ -125,7 +166,7 @@ export default async function ProductDetailPage(props: PageProps<"/products/[slu
           )}
 
           {reels.length > 0 && (
-            <InstagramEmbedsLoader className="border-t border-border-soft/70 pt-6">
+            <InstagramEmbedsLoader>
               <h2 className="mb-3 font-display text-lg font-semibold text-ink">See it in action</h2>
               {reels.length === 1 ? (
                 <div className="max-w-sm">
@@ -145,9 +186,11 @@ export default async function ProductDetailPage(props: PageProps<"/products/[slu
         </div>
       </div>
 
-      <div className="mt-12 border-t border-border-soft/70 pt-8">
-        <ReviewsCarousel title="Customer Reviews" reviews={reviews} />
-      </div>
+      {reviews.length > 0 && (
+        <div className="mt-14 border-t border-border-soft/70 pt-10">
+          <ReviewsCarousel title="Customer Reviews" reviews={reviews} />
+        </div>
+      )}
     </div>
   );
 }

@@ -146,8 +146,8 @@ export function BulkOrderForm() {
         />
       </FieldWrapper>
 
-      <Button type="submit" variant="whatsapp" size="lg" className="w-full sm:w-auto">
-        <MessageCircle className="h-4 w-4" /> Send enquiry on WhatsApp
+      <Button type="submit" size="lg" className="w-full text-xs uppercase tracking-[0.12em] sm:w-auto">
+        <MessageCircle className="h-4 w-4" /> Request a bulk quote
       </Button>
       <p className="text-xs text-ink-soft">
         This opens WhatsApp with your details filled in. Just press send.

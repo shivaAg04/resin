@@ -23,14 +23,14 @@ export function ImageGallery({ images, alt }: { images: string[]; alt: string })
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className={cn("flex gap-3", hasMultiple && "flex-row-reverse")}>
       <div
         role="group"
         aria-roledescription="carousel"
         aria-label={`${alt} photos`}
         tabIndex={hasMultiple ? 0 : -1}
         onKeyDown={handleKeyDown}
-        className="relative aspect-square w-full overflow-hidden rounded-2xl bg-amber-light/40 outline-none focus-visible:ring-2 focus-visible:ring-amber"
+        className="relative aspect-square min-w-0 flex-1 overflow-hidden rounded-lg bg-amber-light/40 outline-none focus-visible:ring-2 focus-visible:ring-amber"
       >
         <Image
           key={active}
@@ -68,22 +68,26 @@ export function ImageGallery({ images, alt }: { images: string[]; alt: string })
       </div>
 
       {hasMultiple && (
-        <div className="flex gap-2 overflow-x-auto">
-          {gallery.map((src, index) => (
-            <button
-              key={src + index}
-              type="button"
-              onClick={() => goTo(index)}
-              aria-label={`View photo ${index + 1}`}
-              aria-current={active === index}
-              className={cn(
-                "relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition-colors",
-                active === index ? "border-amber" : "border-transparent hover:border-amber/40",
-              )}
-            >
-              <Image src={src} alt="" fill sizes="64px" className="object-cover" />
-            </button>
-          ))}
+        // Absolutely-filled so the thumbnail column scrolls within the main
+        // photo's height instead of stretching the gallery taller.
+        <div className="relative w-14 shrink-0 sm:w-16">
+          <div className="absolute inset-0 flex flex-col gap-2 overflow-y-auto">
+            {gallery.map((src, index) => (
+              <button
+                key={src + index}
+                type="button"
+                onClick={() => goTo(index)}
+                aria-label={`View photo ${index + 1}`}
+                aria-current={active === index}
+                className={cn(
+                  "relative aspect-square w-full shrink-0 overflow-hidden rounded-md border-2 transition-colors",
+                  active === index ? "border-ink" : "border-transparent hover:border-ink/30",
+                )}
+              >
+                <Image src={src} alt="" fill sizes="64px" className="object-cover" />
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>

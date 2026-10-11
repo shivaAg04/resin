@@ -3,6 +3,7 @@ import { createCachedPublicClient, createPublicClient } from "@/lib/supabase/pub
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MOCK_PRODUCTS } from "@/lib/data/mock-products";
 import { normalizeReelUrl } from "@/lib/utils/instagram";
+import { isProductBadge } from "@/lib/products/badges";
 import type { BundleItem, Category, Product, ProductInput } from "@/types";
 
 const PRODUCT_WITH_CATEGORIES_SELECT = "*, product_categories(categories(*))";
@@ -23,6 +24,7 @@ function mapProductRow(row: Record<string, unknown>): Product {
 
   return {
     ...(rest as Omit<Product, "categories" | "bundle_items">),
+    badges: Array.isArray(rest.badges) ? (rest.badges as string[]) : [],
     categories: (product_categories ?? []).map((pc) => pc.categories).filter((c): c is Category => Boolean(c)),
     // Only populated for single-product fetches (getProductBySlug /
     // getProductByIdAdmin) — listing queries don't need this extra join.
@@ -218,6 +220,57 @@ export async function getFeaturedProducts(limit = 4): Promise<Product[]> {
   }
 }
 
+/**
+ * "New at Spilled Colours": products the admin picked (show_in_new) first,
+ * then the most recently added ones. Picks are sorted in code rather than
+ * filtered in SQL so this keeps working before migration 0011 is applied.
+ */
+export async function getNewArrivals(limit = 5): Promise<Product[]> {
+  try {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from("products")
+      .select(PRODUCT_WITH_CATEGORIES_SELECT)
+      .eq("is_active", true)
+      .order("created_at", { ascending: false })
+      .limit(60);
+
+    if (error) throw error;
+    const products = (data as Record<string, unknown>[]).map(mapProductRow);
+    const picked = products.filter((p) => p.show_in_new);
+    const rest = products.filter((p) => !p.show_in_new);
+    return [...picked, ...rest].slice(0, limit);
+  } catch (error) {
+    warnMockDataFallback(error);
+    return MOCK_PRODUCTS.slice(0, limit);
+  }
+}
+
+/**
+ * Products marked "Bestseller" in admin, for the homepage section. Returns
+ * nothing (section hidden) rather than demo data if the query fails — e.g.
+ * before migration 0012 adds the badges column.
+ */
+export async function getBestsellers(limit = 10): Promise<Product[]> {
+  try {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from("products")
+      .select(PRODUCT_WITH_CATEGORIES_SELECT)
+      .eq("is_active", true)
+      .contains("badges", ["bestseller"])
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return (data as Record<string, unknown>[]).map(mapProductRow);
+  } catch (error) {
+    console.error("getBestsellers error", error);
+    return [];
+  }
+}
+
 /** Active products tagged with a category, for a homepage horizontal row. */
 export async function getProductsByCategoryForHome(categorySlug: string, limit = 8): Promise<Product[]> {
   try {
@@ -237,6 +290,23 @@ export async function getProductsByCategoryForHome(categorySlug: string, limit =
     warnMockDataFallback(error);
     return MOCK_PRODUCTS.filter((p) => p.categories.some((c) => c.slug === categorySlug)).slice(0, limit);
   }
+}
+
+/**
+ * Photos for the "Past bulk orders" gallery: products in any category whose
+ * name mentions "bulk" or "corporate". Empty (gallery hidden) until the
+ * admin creates such a category.
+ */
+export async function getBulkOrderPhotos(limit = 8): Promise<string[]> {
+  const categories = await getActiveCategories();
+  const bulkCategories = categories.filter((c) => /bulk|corporate/i.test(c.name));
+  const productLists = await Promise.all(bulkCategories.map((c) => getActiveProducts({ categorySlug: c.slug })));
+
+  const photos = new Set<string>();
+  for (const product of productLists.flat()) {
+    for (const image of product.images ?? []) photos.add(image);
+  }
+  return Array.from(photos).slice(0, limit);
 }
 
 /** Categories currently tagged on at least one active product — for the public filter bar. */
@@ -483,6 +553,10 @@ export async function createProduct(input: ProductInput): Promise<{ product?: Pr
       is_active: input.is_active,
       images: input.images,
       reel_url: input.reelUrl ? normalizeReelUrl(input.reelUrl) : null,
+      is_customisable: input.isCustomisable ?? false,
+      show_in_new: input.showInNew ?? false,
+      badges: (input.badges ?? []).filter(isProductBadge),
+      whats_included: input.whatsIncluded?.trim() || null,
     })
     .select("*")
     .single();
@@ -533,6 +607,10 @@ export async function updateProduct(
       is_active: input.is_active,
       images: input.images,
       reel_url: input.reelUrl ? normalizeReelUrl(input.reelUrl) : null,
+      is_customisable: input.isCustomisable ?? false,
+      show_in_new: input.showInNew ?? false,
+      badges: (input.badges ?? []).filter(isProductBadge),
+      whats_included: input.whatsIncluded?.trim() || null,
     })
     .eq("id", id)
     .select("*")
@@ -547,6 +625,27 @@ export async function updateProduct(
   await syncProductBundleItems(supabase, id, input.bundleItemIds ?? []);
   const product = await getProductByIdAdmin(data.id);
   return { product: product ?? undefined };
+}
+
+/** Switches the "Bestseller" badge on or off without touching the product's other badges. */
+export async function setProductBestseller(id: string, isBestseller: boolean): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const { data: current, error: readError } = await supabase.from("products").select("badges").eq("id", id).maybeSingle();
+  if (readError || !current) {
+    console.error("setProductBestseller read error", readError);
+    return { error: "Could not update product." };
+  }
+
+  const others = ((current.badges as string[] | null) ?? []).filter((b) => b !== "bestseller");
+  const { error } = await supabase
+    .from("products")
+    .update({ badges: isBestseller ? [...others, "bestseller"] : others })
+    .eq("id", id);
+  if (error) {
+    console.error("setProductBestseller error", error);
+    return { error: "Could not update product." };
+  }
+  return {};
 }
 
 export async function setProductActive(id: string, isActive: boolean): Promise<{ error?: string }> {

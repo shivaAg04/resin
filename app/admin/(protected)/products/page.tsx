@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ChevronDown, ChevronUp, Pencil, Plus } from "lucide-react";
+import { ChevronDown, ChevronUp, Pencil, Plus, Star } from "lucide-react";
 import { ProductImage } from "@/components/products/ProductImage";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Badge } from "@/components/ui/Badge";
@@ -8,7 +8,12 @@ import { SortWeightInput } from "@/components/admin/SortWeightInput";
 import { AdminSearchBar } from "@/components/admin/AdminSearchBar";
 import { getAllProductsAdmin } from "@/lib/data/products";
 import { formatPrice } from "@/lib/utils/format";
-import { moveProductSortOrderAction, setProductSortOrderAction, toggleProductActiveAction } from "./actions";
+import {
+  moveProductSortOrderAction,
+  setProductSortOrderAction,
+  toggleProductActiveAction,
+  toggleProductBestsellerAction,
+} from "./actions";
 import { DeleteProductButton } from "@/components/admin/DeleteProductButton";
 
 export const metadata: Metadata = { title: "Products" };
@@ -117,6 +122,28 @@ export default async function AdminProductsPage(props: PageProps<"/admin/product
                       className="rounded-full border border-ink/15 px-3 py-2 text-sm font-medium text-ink-soft transition-colors hover:bg-ink/5"
                     >
                       {product.is_active ? "Deactivate" : "Activate"}
+                    </button>
+                  </form>
+
+                  <form action={toggleProductBestsellerAction}>
+                    <input type="hidden" name="id" value={product.id} />
+                    <input type="hidden" name="nextBestseller" value={String(!product.badges.includes("bestseller"))} />
+                    <button
+                      type="submit"
+                      title={product.badges.includes("bestseller") ? "Remove from Best Sellers" : "Add to Best Sellers"}
+                      aria-label={
+                        product.badges.includes("bestseller")
+                          ? `Remove ${product.name} from Best Sellers`
+                          : `Add ${product.name} to Best Sellers`
+                      }
+                      aria-pressed={product.badges.includes("bestseller")}
+                      className={
+                        product.badges.includes("bestseller")
+                          ? "flex h-9 w-9 items-center justify-center rounded-full bg-amber-light text-amber-dark"
+                          : "flex h-9 w-9 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-ink/5 hover:text-ink"
+                      }
+                    >
+                      <Star className="h-4 w-4" fill={product.badges.includes("bestseller") ? "currentColor" : "none"} />
                     </button>
                   </form>
 

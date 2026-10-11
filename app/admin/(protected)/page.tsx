@@ -4,12 +4,17 @@ import { StatCard } from "@/components/admin/StatCard";
 import { PaymentBadge } from "@/components/admin/PaymentBadge";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { getDashboardStats, getRecentOrdersAdmin } from "@/lib/data/orders";
+import { countNewCustomRequests } from "@/lib/data/custom-requests";
 import { formatDate, formatPrice } from "@/lib/utils/format";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
 export default async function AdminDashboardPage() {
-  const [stats, recentOrders] = await Promise.all([getDashboardStats(), getRecentOrdersAdmin(8)]);
+  const [stats, recentOrders, newCustomRequests] = await Promise.all([
+    getDashboardStats(),
+    getRecentOrdersAdmin(8),
+    countNewCustomRequests(),
+  ]);
 
   return (
     <div>
@@ -22,6 +27,19 @@ export default async function AdminDashboardPage() {
         <StatCard label="Delivered Orders" value={String(stats.deliveredOrders)} />
         <StatCard label="Total Revenue" value={formatPrice(stats.totalRevenue)} className="col-span-2 lg:col-span-1" />
       </div>
+
+      {newCustomRequests > 0 && (
+        <Link
+          href="/admin/custom-requests?status=new"
+          className="mt-4 flex items-center justify-between rounded-2xl border border-amber/40 bg-lilac px-5 py-4 text-sm text-ink hover:border-amber"
+        >
+          <span>
+            <span className="font-semibold">{newCustomRequests}</span> new custom request
+            {newCustomRequests === 1 ? "" : "s"} waiting for a reply
+          </span>
+          <span className="font-medium text-amber-dark">View →</span>
+        </Link>
+      )}
 
       <div className="mt-8 overflow-hidden rounded-2xl border border-border-soft/70 bg-white">
         <div className="border-b border-border-soft/70 px-5 py-4">

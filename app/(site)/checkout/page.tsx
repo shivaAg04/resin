@@ -16,7 +16,7 @@ function UnavailableState({ message }: { message: string }) {
   return (
     <div className="mx-auto flex max-w-md flex-col items-center gap-4 px-4 py-24 text-center">
       <AlertCircle className="h-10 w-10 text-amber-dark" strokeWidth={1.5} />
-      <h1 className="font-display text-2xl font-semibold text-ink">{message}</h1>
+      <h1 className="font-display text-3xl font-medium text-ink">{message}</h1>
       <ButtonLink href="/products">Browse products</ButtonLink>
     </div>
   );
@@ -31,8 +31,8 @@ export default async function CheckoutPage(props: PageProps<"/checkout">) {
   // (cart lives in localStorage, so that path is rendered client-side).
   if (!slug) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
-        <h1 className="font-display text-3xl font-semibold text-ink">Checkout</h1>
+      <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+        <h1 className="font-display text-4xl font-medium text-ink">Checkout</h1>
         <div className="mt-8">
           <CartCheckout />
         </div>
@@ -47,11 +47,11 @@ export default async function CheckoutPage(props: PageProps<"/checkout">) {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
+    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
       <Link href={`/products/${product.slug}`} className="text-sm text-ink-soft hover:text-ink">
         &larr; Back to product
       </Link>
-      <h1 className="mt-3 font-display text-3xl font-semibold text-ink">Checkout</h1>
+      <h1 className="mt-3 font-display text-4xl font-medium text-ink">Checkout</h1>
 
       <div className="mt-8">
         <CheckoutForm

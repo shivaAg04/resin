@@ -10,6 +10,7 @@ import {
   getProductByIdAdmin,
   moveProductSortOrder,
   setProductActive,
+  setProductBestseller,
   setProductSortOrder,
   updateProduct,
 } from "@/lib/data/products";
@@ -71,6 +72,18 @@ export async function toggleProductActiveAction(formData: FormData): Promise<voi
   const product = await getProductByIdAdmin(id);
   if (product) revalidatePath(`/products/${product.slug}`);
   await revalidateContainingBundles(id);
+}
+
+export async function toggleProductBestsellerAction(formData: FormData): Promise<void> {
+  const id = String(formData.get("id"));
+  const nextBestseller = formData.get("nextBestseller") === "true";
+  await setProductBestseller(id, nextBestseller);
+  revalidatePath("/admin/products");
+  revalidatePath("/products");
+  revalidateCatalog();
+  revalidatePath("/");
+  const product = await getProductByIdAdmin(id);
+  if (product) revalidatePath(`/products/${product.slug}`);
 }
 
 export async function moveProductSortOrderAction(formData: FormData): Promise<void> {

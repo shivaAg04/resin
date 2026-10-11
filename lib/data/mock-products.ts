@@ -10,7 +10,18 @@ import type { Category, Product } from "@/types";
 const now = new Date().toISOString();
 
 function category(id: string, code: string, name: string, slug: string, homePosition: number): Category {
-  return { id, code, name, slug, show_on_home: true, home_position: homePosition, created_at: now, updated_at: now };
+  return {
+    id,
+    code,
+    name,
+    slug,
+    show_on_home: true,
+    home_position: homePosition,
+    image_url: null,
+    description: null,
+    created_at: now,
+    updated_at: now,
+  };
 }
 
 const RODCUTS = category("c0000000-0000-0000-0000-000000000001", "C001", "Rodcuts", "rodcuts", 0);
@@ -31,6 +42,10 @@ export const MOCK_PRODUCTS: Product[] = [
     images: [],
     sort_order: 0,
     reel_url: null,
+    is_customisable: false,
+    show_in_new: false,
+    badges: [],
+    whats_included: null,
     bundle_items: [],
     discount_amount: 0,
     created_at: now,
@@ -49,6 +64,10 @@ export const MOCK_PRODUCTS: Product[] = [
     images: [],
     sort_order: 1,
     reel_url: null,
+    is_customisable: false,
+    show_in_new: false,
+    badges: [],
+    whats_included: null,
     bundle_items: [],
     discount_amount: 0,
     created_at: now,
@@ -66,6 +85,10 @@ export const MOCK_PRODUCTS: Product[] = [
     images: [],
     sort_order: 2,
     reel_url: null,
+    is_customisable: false,
+    show_in_new: false,
+    badges: [],
+    whats_included: null,
     bundle_items: [],
     discount_amount: 0,
     created_at: now,
@@ -83,6 +106,10 @@ export const MOCK_PRODUCTS: Product[] = [
     images: [],
     sort_order: 3,
     reel_url: null,
+    is_customisable: false,
+    show_in_new: false,
+    badges: [],
+    whats_included: null,
     bundle_items: [],
     discount_amount: 0,
     created_at: now,
@@ -101,6 +128,10 @@ export const MOCK_PRODUCTS: Product[] = [
     images: [],
     sort_order: 4,
     reel_url: null,
+    is_customisable: false,
+    show_in_new: false,
+    badges: [],
+    whats_included: null,
     bundle_items: [],
     discount_amount: 0,
     created_at: now,

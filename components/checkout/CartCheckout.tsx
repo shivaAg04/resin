@@ -15,7 +15,7 @@ export function CartCheckout() {
     return (
       <div className="flex flex-col items-center gap-4 py-16 text-center">
         <AlertCircle className="h-10 w-10 text-amber-dark" strokeWidth={1.5} />
-        <h2 className="font-display text-2xl font-semibold text-ink">Your cart is empty</h2>
+        <h2 className="font-display text-3xl font-medium text-ink">Your cart is empty</h2>
         <ButtonLink href="/products">Browse products</ButtonLink>
       </div>
     );

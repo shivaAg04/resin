@@ -9,6 +9,7 @@ import {
   renameCategory,
   setCategoryHomePosition,
   setCategoryShowOnHome,
+  updateCategoryDetails,
 } from "@/lib/data/categories";
 
 function revalidateCategoryPages() {
@@ -30,6 +31,15 @@ export async function renameCategoryAction(formData: FormData): Promise<void> {
   const name = String(formData.get("name") ?? "");
   await renameCategory(id, name);
   revalidateCategoryPages();
+}
+
+export async function updateCategoryDetailsAction(
+  id: string,
+  details: { imageUrl: string; description: string },
+): Promise<{ error?: string }> {
+  const result = await updateCategoryDetails(id, details);
+  revalidateCategoryPages();
+  return result;
 }
 
 export async function deleteCategoryAction(formData: FormData): Promise<void> {

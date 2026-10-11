@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Clapperboard, LayoutDashboard, MessageSquareQuote, Package, Receipt, Tags } from "lucide-react";
+import { Clapperboard, LayoutDashboard, MessageSquareQuote, Package, Receipt, Sparkles, Tags } from "lucide-react";
 import { cn } from "@/lib/utils/format";
 import { LogoutButton } from "@/components/admin/LogoutButton";
 
@@ -14,6 +14,7 @@ const links = [
   { href: "/admin/reels", label: "Reels", icon: Clapperboard },
   { href: "/admin/testimonials", label: "Testimonials", icon: MessageSquareQuote },
   { href: "/admin/orders", label: "Orders", icon: Receipt },
+  { href: "/admin/custom-requests", label: "Custom Requests", icon: Sparkles },
 ];
 
 export function AdminSidebar() {
@@ -26,7 +27,7 @@ export function AdminSidebar() {
           <Image src="/logo.png" alt="Spilled Colours" width={158} height={54} className="h-7 w-auto" />
           <span className="text-xs font-medium uppercase tracking-wide text-ink-soft">Admin</span>
         </div>
-        <nav className="mt-4 flex gap-1 sm:flex-col">
+        <nav className="mt-4 flex gap-1 overflow-x-auto sm:flex-col sm:overflow-visible">
           {links.map(({ href, label, icon: Icon }) => {
             const active = href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
             return (

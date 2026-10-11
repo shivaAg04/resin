@@ -16,10 +16,10 @@ export function CategoryFilter({
       <Link
         href="/products"
         className={cn(
-          "rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
+          "rounded-full border px-4 py-1.5 text-[13px] transition-colors",
           !activeSlug
             ? "border-ink bg-ink text-cream"
-            : "border-border-soft text-ink-soft hover:border-ink/30",
+            : "border-ink/15 bg-white text-ink-soft hover:border-ink/40 hover:text-ink",
         )}
       >
         All
@@ -29,10 +29,10 @@ export function CategoryFilter({
           key={category.id}
           href={`/products?category=${encodeURIComponent(category.slug)}`}
           className={cn(
-            "rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
+            "rounded-full border px-4 py-1.5 text-[13px] transition-colors",
             activeSlug === category.slug
               ? "border-ink bg-ink text-cream"
-              : "border-border-soft text-ink-soft hover:border-ink/30",
+              : "border-ink/15 bg-white text-ink-soft hover:border-ink/40 hover:text-ink",
           )}
         >
           {category.name}

@@ -32,17 +32,18 @@ export default async function OrderSuccessPage(props: PageProps<"/order-success/
 
   return (
     <div className="mx-auto flex max-w-lg flex-col items-center px-4 py-16 text-center sm:py-24">
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-700">
+      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-lilac text-amber-dark">
         <CheckCircle2 className="h-9 w-9" strokeWidth={1.5} />
       </div>
 
-      <h1 className="mt-6 font-display text-3xl font-semibold text-ink">Order Placed Successfully</h1>
+      <h1 className="mt-6 font-display text-4xl font-medium text-ink">Thank you!</h1>
+      <p className="mt-1 font-script text-3xl text-amber-dark">Your order is placed</p>
       <p className="mt-2 text-sm text-ink-soft">
         Order Number: <span className="font-semibold text-ink">{orderNumber}</span>
       </p>
 
       {confirmation && (
-        <div className="mt-8 w-full rounded-2xl border border-border-soft/70 bg-white p-5 text-left">
+        <div className="mt-8 w-full rounded-lg border border-border-soft/70 bg-white p-5 text-left">
           {confirmation.items.map((item, index) => (
             <div
               key={`${item.productName}-${index}`}
@@ -64,14 +65,15 @@ export default async function OrderSuccessPage(props: PageProps<"/order-success/
       )}
 
       <p className="mt-6 text-sm text-ink-soft">
-        Payment received. We&apos;ll message you on WhatsApp with delivery and tracking updates.
+        Payment received. We&apos;ll message you on WhatsApp with your shipping charges, a preview of your piece
+        before dispatch, and tracking updates.
       </p>
 
       <div className="mt-6 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
-        <ButtonLink href={whatsappUrl} target="_blank" rel="noopener noreferrer" variant="whatsapp" size="lg">
+        <ButtonLink href={whatsappUrl} target="_blank" rel="noopener noreferrer" variant="whatsapp" size="lg" className="text-xs uppercase tracking-[0.12em]">
           <MessageCircle className="h-4 w-4" /> Chat on WhatsApp
         </ButtonLink>
-        <ButtonLink href="/products" variant="outline" size="lg">
+        <ButtonLink href="/products" variant="outline" size="lg" className="text-xs uppercase tracking-[0.12em]">
           Continue Shopping
         </ButtonLink>
       </div>

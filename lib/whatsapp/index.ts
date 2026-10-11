@@ -56,16 +56,22 @@ export function buildAdminContactMessage(order: { order_number: string; customer
 }
 
 /**
- * Customer numbers are stored as bare 10-digit Indian mobile numbers (see
+ * Indian customer numbers are stored as bare 10-digit mobiles (see
  * normalizeIndianMobile) — wa.me links require the country code, so it's
  * added back on here rather than at storage time (storage stays in the
  * plain local format shown in the admin panel and order messages).
+ * International numbers are stored with their "+<code>" already.
  */
 export function buildAdminContactWhatsAppUrl(order: {
   order_number: string;
   customer_name: string;
   whatsapp_number: string;
 }): string {
-  const target = `91${digitsOnly(order.whatsapp_number)}`;
-  return buildWhatsAppUrl(target, buildAdminContactMessage(order));
+  return buildCustomerWhatsAppUrl(order.whatsapp_number, buildAdminContactMessage(order));
+}
+
+/** wa.me link to a customer number as stored (bare Indian 10-digit, or "+<code>…" for other countries). */
+export function buildCustomerWhatsAppUrl(storedNumber: string, message: string): string {
+  const target = storedNumber.startsWith("+") ? digitsOnly(storedNumber) : `91${digitsOnly(storedNumber)}`;
+  return buildWhatsAppUrl(target, message);
 }

@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --color-cream: #fffaf8;
+  --color-cream: #fcf8f5;
   --color-ink: #1f0352;
+  /* Deep plum for the purple CTA band and button hovers, and a soft
+     lilac-pink tint for alternating section backgrounds. */
+  --color-plum: #3d1a6e;
+  --color-lilac: #f7edf1;
   --color-ink-soft: #6d5b8f;
   /* Brand pinks — amber/rose are the two majorly-used shades; amber-dark is
      a deepened derivative (not one of the 5 given hexes) used only where
@@ -22,6 +26,8 @@
   --color-cream: var(--color-cream);
   --color-ink: var(--color-ink);
   --color-ink-soft: var(--color-ink-soft);
+  --color-plum: var(--color-plum);
+  --color-lilac: var(--color-lilac);
   --color-amber: var(--color-amber);
   --color-rose: var(--color-rose);
   --color-amber-dark: var(--color-amber-dark);
@@ -29,8 +35,9 @@
   --color-blush: var(--color-blush);
   --color-peach: var(--color-peach);
   --color-border-soft: var(--color-border);
-  --font-display: var(--font-fraunces);
-  --font-sans: var(--font-inter);
+  --font-display: var(--font-cormorant);
+  --font-sans: var(--font-jost);
+  --font-script: var(--font-allura);
 }
 
 body {

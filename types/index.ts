@@ -22,6 +22,8 @@ export interface Category {
   slug: string;
   show_on_home: boolean;
   home_position: number;
+  image_url: string | null;
+  description: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -49,6 +51,11 @@ export interface Product {
   categories: Category[];
   sort_order: number;
   reel_url: string | null;
+  is_customisable: boolean;
+  show_in_new: boolean;
+  /** See lib/products/badges.ts. Missing on rows read before migration 0012. */
+  badges: string[];
+  whats_included: string | null;
   bundle_items: BundleItem[];
   created_at: string;
   updated_at: string;
@@ -65,6 +72,10 @@ export type ProductInput = {
   reelUrl?: string;
   bundleItemIds?: string[];
   discountAmount?: number;
+  isCustomisable?: boolean;
+  showInNew?: boolean;
+  badges?: string[];
+  whatsIncluded?: string;
 };
 
 export interface Reel {

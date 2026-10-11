@@ -18,26 +18,27 @@ export default function CartPage() {
     return (
       <div className="mx-auto flex max-w-md flex-col items-center gap-4 px-4 py-24 text-center">
         <ShoppingBag className="h-10 w-10 text-amber-dark" strokeWidth={1.5} />
-        <h1 className="font-display text-2xl font-semibold text-ink">Your cart is empty</h1>
-        <ButtonLink href="/products">Browse products</ButtonLink>
+        <h1 className="font-display text-3xl font-medium text-ink">Your cart is empty</h1>
+        <p className="text-sm text-ink-soft">Find something you love — or send us your idea and we&apos;ll make it.</p>
+        <ButtonLink href="/products" className="text-xs uppercase tracking-[0.12em]">Shop the collection</ButtonLink>
       </div>
     );
   }
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
-      <h1 className="font-display text-3xl font-semibold text-ink">Your Cart</h1>
+      <h1 className="font-display text-4xl font-medium text-ink">Your Cart</h1>
 
       <div className="mt-8 flex flex-col gap-4">
         {items.map((item) => (
           <div
             key={item.productSlug}
-            className="flex flex-col gap-3 rounded-2xl border border-border-soft/70 bg-white p-4 sm:flex-row sm:items-center"
+            className="flex flex-col gap-3 rounded-lg border border-border-soft/70 bg-white p-4 sm:flex-row sm:items-center"
           >
             <div className="flex flex-1 items-center gap-4">
-              <ProductImage src={item.image} alt={item.name} className="h-16 w-16 shrink-0 rounded-xl" />
+              <ProductImage src={item.image} alt={item.name} className="h-20 w-20 shrink-0 rounded-md" />
               <div className="min-w-0 flex-1">
-                <Link href={`/products/${item.productSlug}`} className="block truncate font-medium text-ink hover:underline">
+                <Link href={`/products/${item.productSlug}`} className="block truncate font-display text-lg font-medium text-ink hover:text-amber-dark">
                   {item.name}
                 </Link>
                 <p className="text-sm text-ink-soft">{formatPrice(item.price)}</p>
@@ -67,15 +68,16 @@ export default function CartPage() {
       </div>
 
       <div className="mt-8 flex items-center justify-between border-t border-border-soft/70 pt-6">
-        <span className="font-display text-lg font-semibold text-ink">Total</span>
-        <span className="font-display text-xl font-semibold text-amber-dark">{formatPrice(totalPrice)}</span>
+        <span className="font-display text-xl font-medium uppercase tracking-wide text-ink">Total</span>
+        <span className="font-display text-2xl font-semibold text-amber-dark">{formatPrice(totalPrice)}</span>
       </div>
+      <p className="mt-2 text-right text-xs text-ink-soft">Shipping is shared on WhatsApp after you order.</p>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-        <ButtonLink href="/checkout" size="lg" className="w-full sm:w-auto">
+        <ButtonLink href="/checkout" size="lg" className="w-full text-xs uppercase tracking-[0.12em] sm:w-auto">
           Proceed to Checkout <ArrowRight className="h-4 w-4" />
         </ButtonLink>
-        <ButtonLink href="/products" variant="outline" size="lg" className="w-full sm:w-auto">
+        <ButtonLink href="/products" variant="outline" size="lg" className="w-full text-xs uppercase tracking-[0.12em] sm:w-auto">
           Continue Shopping
         </ButtonLink>
       </div>

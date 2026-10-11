@@ -13,6 +13,12 @@ export function normalizeIndianMobile(raw: string): string {
   return digits;
 }
 
+/** International numbers are stored as "+<country code><number>", digits only after the +. */
+export function normalizeInternationalNumber(raw: string): string {
+  const digits = raw.replace(/^\s*00/, "").replace(/\D/g, "");
+  return `+${digits}`;
+}
+
 const indianMobileSchema = z
   .string()
   .trim()
@@ -52,3 +58,50 @@ export const createOrderSchema = customerDetailsSchema.extend({
 export type CustomerDetailsInput = z.infer<typeof customerDetailsSchema>;
 export type CartItemInput = z.infer<typeof cartItemSchema>;
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;
+
+/**
+ * A WhatsApp number from a form that doesn't ask for a country: "+<code>…"
+ * (or "00<code>…") is international, anything else is read as an Indian
+ * mobile. Returns the stored form ("9876543210" or "+447700900123").
+ */
+export function normalizeAnyWhatsAppNumber(raw: string): string {
+  const trimmed = raw.trim();
+  if (trimmed.startsWith("+") || trimmed.startsWith("00")) {
+    const international = normalizeInternationalNumber(trimmed);
+    return international.startsWith("+91") ? normalizeIndianMobile(international) : international;
+  }
+  return normalizeIndianMobile(trimmed);
+}
+
+function isValidStoredWhatsAppNumber(value: string): boolean {
+  if (value.startsWith("+")) return value.length >= 9 && value.length <= 16;
+  return /^[6-9]\d{9}$/.test(value);
+}
+
+const requiredChoice = (message: string) => z.string().trim().min(1, message).max(120);
+
+export const customRequestSchema = z.object({
+  customerName: z.string().trim().min(2, "Name is required").max(100),
+  whatsappNumber: z
+    .string()
+    .trim()
+    .min(1, "WhatsApp number is required")
+    .transform(normalizeAnyWhatsAppNumber)
+    .refine(isValidStoredWhatsAppNumber, {
+      message: "Enter a 10-digit mobile number, or include your country code (e.g. +44…)",
+    }),
+  lookingFor: requiredChoice("Please choose what you're looking for"),
+  occasion: requiredChoice("Please choose an occasion"),
+  budget: requiredChoice("Please choose a budget"),
+  quantity: requiredChoice("Please choose a quantity"),
+  requiredDate: z
+    .string()
+    .trim()
+    .optional()
+    .refine((v) => !v || /^\d{4}-\d{2}-\d{2}$/.test(v), { message: "Enter a valid date" }),
+  preferredColours: z.string().trim().min(2, "Tell us the colours you'd like").max(200),
+  details: z.string().trim().max(1000, "Please keep this under 1000 characters").optional(),
+  referenceImages: z.array(z.string()).max(3).default([]),
+});
+
+export type CustomRequestInput = z.infer<typeof customRequestSchema>;

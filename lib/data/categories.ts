@@ -125,6 +125,23 @@ export async function renameCategory(id: string, name: string): Promise<{ catego
   return { category: data as Category };
 }
 
+/** Cover image and one-line description shown on the homepage "Shop by Category" cards. */
+export async function updateCategoryDetails(
+  id: string,
+  details: { imageUrl: string; description: string },
+): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("categories")
+    .update({ image_url: details.imageUrl || null, description: details.description.trim() || null })
+    .eq("id", id);
+  if (error) {
+    console.error("updateCategoryDetails error", error);
+    return { error: "Could not save category details." };
+  }
+  return {};
+}
+
 export async function deleteCategory(id: string): Promise<{ error?: string }> {
   const supabase = await createClient();
   const { error } = await supabase.from("categories").delete().eq("id", id);
