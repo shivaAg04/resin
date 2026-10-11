@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
+import { WhatsAppIcon } from "@/components/icons/BrandIcons";
 import Image from "next/image";
 import Link from "next/link";
-import { MessageCircle } from "lucide-react";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { CustomRequestStatusSelect } from "@/components/admin/CustomRequestStatusSelect";
 import { DeleteCustomRequestButton } from "@/components/admin/DeleteCustomRequestButton";
@@ -138,7 +138,7 @@ export default async function AdminCustomRequestsPage(props: PageProps<"/admin/c
                 size="sm"
                 className="mt-5"
               >
-                <MessageCircle className="h-4 w-4" /> Message on WhatsApp
+                <WhatsAppIcon className="h-4 w-4" /> Message on WhatsApp
               </ButtonLink>
             </article>
           ))

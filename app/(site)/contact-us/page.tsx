@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Camera, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
+import { InstagramIcon, WhatsAppIcon } from "@/components/icons/BrandIcons";
 import { PolicyPage } from "@/components/legal/PolicyPage";
 import { BUSINESS, getDisplayPhone } from "@/lib/legal";
 import { buildGenericWhatsAppUrl } from "@/lib/whatsapp";
@@ -13,14 +14,14 @@ export default function ContactUsPage() {
 
   const rows = [
     phone && {
-      icon: MessageCircle,
+      icon: WhatsAppIcon,
       label: "WhatsApp",
       value: phone,
       href: buildGenericWhatsAppUrl(),
     },
     phone && { icon: Phone, label: "Phone", value: phone, href: `tel:${phone.replace(/\s/g, "")}` },
     BUSINESS.email && { icon: Mail, label: "Email", value: BUSINESS.email, href: `mailto:${BUSINESS.email}` },
-    instagramUrl && { icon: Camera, label: "Instagram", value: "@spilled.colours__", href: instagramUrl },
+    instagramUrl && { icon: InstagramIcon, label: "Instagram", value: "@spilled.colours__", href: instagramUrl },
     BUSINESS.address && { icon: MapPin, label: "Address", value: BUSINESS.address },
   ].filter(Boolean) as { icon: typeof Mail; label: string; value: string; href?: string }[];
 

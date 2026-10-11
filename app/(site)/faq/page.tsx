@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { ArrowRight, MessageCircle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { WhatsAppIcon } from "@/components/icons/BrandIcons";
 import { Eyebrow } from "@/components/home/Eyebrow";
 import { Disclosure } from "@/components/ui/Disclosure";
 import { ButtonLink } from "@/components/ui/ButtonLink";
@@ -42,7 +43,7 @@ export default function FaqPage() {
       <div className="mt-10 flex flex-col items-start gap-4 rounded-lg bg-lilac p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
         <div className="flex gap-4">
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-amber-dark">
-            <MessageCircle className="h-5 w-5" strokeWidth={1.5} />
+            <WhatsAppIcon className="h-5 w-5" />
           </span>
           <div>
             <p className="font-display text-xl font-medium text-ink">Still have a question?</p>

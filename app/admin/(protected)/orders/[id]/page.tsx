@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
+import { WhatsAppIcon } from "@/components/icons/BrandIcons";
 import { notFound } from "next/navigation";
-import { MessageCircle } from "lucide-react";
 import { CopyableId } from "@/components/admin/CopyableId";
 import { PaymentBadge, getPaymentState } from "@/components/admin/PaymentBadge";
 import { OrderStatusSelect } from "@/components/admin/OrderStatusSelect";
@@ -57,7 +57,7 @@ export default async function AdminOrderDetailPage(props: PageProps<"/admin/orde
             size="sm"
             className="mt-4 w-full"
           >
-            <MessageCircle className="h-4 w-4" /> Contact on WhatsApp
+            <WhatsAppIcon className="h-4 w-4" /> Contact on WhatsApp
           </ButtonLink>
         </div>
 

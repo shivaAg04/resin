@@ -1,5 +1,5 @@
-import { MessageCircle } from "lucide-react";
 import { buildGenericWhatsAppUrl } from "@/lib/whatsapp";
+import { WhatsAppIcon } from "@/components/icons/BrandIcons";
 
 export function CtaBand() {
   const whatsappUrl = buildGenericWhatsAppUrl("Hi! I have something in mind I'd like made.");
@@ -19,7 +19,7 @@ export function CtaBand() {
           rel="noopener noreferrer"
           className="mt-5 inline-flex h-10 items-center gap-2 rounded-full bg-cream px-5 text-[11px] font-medium uppercase tracking-[0.12em] text-ink transition-colors hover:bg-white"
         >
-          <MessageCircle className="h-4 w-4" /> Chat with us on WhatsApp
+          <WhatsAppIcon className="h-4 w-4" /> Chat with us on WhatsApp
         </a>
         <p className="mt-6 rotate-[-4deg] font-script text-2xl text-cream/70 lg:absolute lg:bottom-6 lg:right-10 lg:mt-0">
           Let&apos;s create something beautiful

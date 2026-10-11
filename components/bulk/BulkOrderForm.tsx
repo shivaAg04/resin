@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { MessageCircle } from "lucide-react";
+import { WhatsAppIcon } from "@/components/icons/BrandIcons";
 import { Button } from "@/components/ui/Button";
 import { FieldWrapper, Input, Textarea } from "@/components/ui/Field";
 import { buildGenericWhatsAppUrl } from "@/lib/whatsapp";
@@ -147,7 +147,7 @@ export function BulkOrderForm() {
       </FieldWrapper>
 
       <Button type="submit" size="lg" className="w-full text-xs uppercase tracking-[0.12em] sm:w-auto">
-        <MessageCircle className="h-4 w-4" /> Request a bulk quote
+        <WhatsAppIcon className="h-4 w-4" /> Request a bulk quote
       </Button>
       <p className="text-xs text-ink-soft">
         This opens WhatsApp with your details filled in. Just press send.

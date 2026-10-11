@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Camera, Globe, Mail, MapPin, MessageCircle, Users } from "lucide-react";
+import { Mail, MapPin } from "lucide-react";
+import { FacebookIcon, InstagramIcon, WhatsAppIcon } from "@/components/icons/BrandIcons";
 import { buildGenericWhatsAppUrl } from "@/lib/whatsapp";
 import { getActiveCategories } from "@/lib/data/products";
 import { BUSINESS } from "@/lib/legal";
@@ -43,11 +44,16 @@ export async function SiteFooter() {
             </p>
             <div className="mt-5 flex gap-2">
               <a href={instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className={socialIconClasses}>
-                <Camera className="h-4 w-4" />
+                <InstagramIcon className="h-4 w-4" />
               </a>
               <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className={socialIconClasses}>
-                <MessageCircle className="h-4 w-4" />
+                <WhatsAppIcon className="h-4 w-4" />
               </a>
+              {facebookUrl && (
+                <a href={facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className={socialIconClasses}>
+                  <FacebookIcon className="h-4 w-4" />
+                </a>
+              )}
               <a href={`mailto:${contactEmail}`} aria-label="Email" className={socialIconClasses}>
                 <Mail className="h-4 w-4" />
               </a>
@@ -91,19 +97,19 @@ export async function SiteFooter() {
           <div className="col-span-2 flex flex-col gap-2.5 text-sm sm:col-span-1">
             <span className={headingClasses}>Get in Touch</span>
             <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 ${linkClasses}`}>
-              <Camera className="h-4 w-4 shrink-0" /> @spilled.colours__
+              <InstagramIcon className="h-4 w-4 shrink-0" /> @spilled.colours__
             </a>
             <a href={`mailto:${contactEmail}`} className={`flex items-center gap-2 break-all ${linkClasses}`}>
               <Mail className="h-4 w-4 shrink-0" /> {contactEmail}
             </a>
             {communityUrl && (
               <a href={communityUrl} target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 ${linkClasses}`}>
-                <Users className="h-4 w-4 shrink-0" /> WhatsApp Community
+                <WhatsAppIcon className="h-4 w-4 shrink-0" /> WhatsApp Community
               </a>
             )}
             {facebookUrl && (
               <a href={facebookUrl} target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 ${linkClasses}`}>
-                <Globe className="h-4 w-4 shrink-0" /> Facebook
+                <FacebookIcon className="h-4 w-4 shrink-0" /> Facebook
               </a>
             )}
             <span className="flex items-center gap-2 text-ink-soft">

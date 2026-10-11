@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { CheckCircle2, MessageCircle } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
+import { WhatsAppIcon } from "@/components/icons/BrandIcons";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { decodeOrderConfirmation } from "@/lib/utils/order-confirmation";
 import { buildOrderWhatsAppUrl } from "@/lib/whatsapp";
@@ -71,7 +72,7 @@ export default async function OrderSuccessPage(props: PageProps<"/order-success/
 
       <div className="mt-6 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
         <ButtonLink href={whatsappUrl} target="_blank" rel="noopener noreferrer" variant="whatsapp" size="lg" className="text-xs uppercase tracking-[0.12em]">
-          <MessageCircle className="h-4 w-4" /> Chat on WhatsApp
+          <WhatsAppIcon className="h-4 w-4" /> Chat on WhatsApp
         </ButtonLink>
         <ButtonLink href="/products" variant="outline" size="lg" className="text-xs uppercase tracking-[0.12em]">
           Continue Shopping
