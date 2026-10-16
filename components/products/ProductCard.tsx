@@ -62,7 +62,7 @@ export function ProductCard({ product, compact = false }: { product: Product; co
         </h3>
         <ProductPrice
           product={product}
-          className={compact ? "text-[13px] text-ink-soft" : "font-display text-base font-semibold text-amber-dark sm:text-lg"}
+          className={compact ? "text-[13px] text-ink-soft" : "font-sans text-base font-semibold tabular-nums text-amber-dark sm:text-lg"}
         />
 
         {!compact && product.description && (

@@ -29,6 +29,7 @@ function mapProductRow(row: Record<string, unknown>): Product {
     reel_url_2: (rest.reel_url_2 as string) || null,
     allow_customer_image: Boolean(rest.allow_customer_image),
     design_options: Array.isArray(rest.design_options) ? (rest.design_options as string[]) : [],
+    design_images: Array.isArray(rest.design_images) ? (rest.design_images as string[]) : [],
     categories: (product_categories ?? []).map((pc) => pc.categories).filter((c): c is Category => Boolean(c)),
     // Only populated for single-product fetches (getProductBySlug /
     // getProductByIdAdmin) — listing queries don't need this extra join.
@@ -563,6 +564,17 @@ async function resolveProductPrice(
   return Math.max(0, Math.round((subtotal - discount) * 100) / 100);
 }
 
+/** Splits the admin's design rows into the two index-aligned columns, dropping unnamed rows. */
+function designColumns(input: ProductInput) {
+  const designs = (input.designOptions ?? [])
+    .map((d) => ({ name: d.name.trim(), image: d.image.trim() }))
+    .filter((d) => d.name);
+  return {
+    design_options: designs.map((d) => d.name),
+    design_images: designs.map((d) => (input.images.includes(d.image) ? d.image : "")),
+  };
+}
+
 export async function createProduct(input: ProductInput): Promise<{ product?: Product; error?: string }> {
   const supabase = await createClient();
   const slug = await uniqueSlug(supabase, input.slug || input.name);
@@ -582,7 +594,7 @@ export async function createProduct(input: ProductInput): Promise<{ product?: Pr
       reel_url_2: input.reelUrl2 ? normalizeReelUrl(input.reelUrl2) : null,
       is_customisable: input.isCustomisable ?? false,
       allow_customer_image: input.allowCustomerImage ?? false,
-      design_options: (input.designOptions ?? []).map((d) => d.trim()).filter(Boolean),
+      ...designColumns(input),
       keywords: (input.keywords ?? []).map((k) => k.trim()).filter(Boolean),
       show_in_new: input.showInNew ?? false,
       badges: (input.badges ?? []).filter(isProductBadge),
@@ -640,7 +652,7 @@ export async function updateProduct(
       reel_url_2: input.reelUrl2 ? normalizeReelUrl(input.reelUrl2) : null,
       is_customisable: input.isCustomisable ?? false,
       allow_customer_image: input.allowCustomerImage ?? false,
-      design_options: (input.designOptions ?? []).map((d) => d.trim()).filter(Boolean),
+      ...designColumns(input),
       keywords: (input.keywords ?? []).map((k) => k.trim()).filter(Boolean),
       show_in_new: input.showInNew ?? false,
       badges: (input.badges ?? []).filter(isProductBadge),

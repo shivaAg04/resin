@@ -6,11 +6,12 @@ import Image from "next/image";
 import { ArrowRight, Loader2, Upload, X } from "lucide-react";
 import { QuantitySelector } from "@/components/products/QuantitySelector";
 import { AddToCartButton } from "@/components/products/AddToCartButton";
+import { showGalleryImage } from "@/components/products/ImageGallery";
 import { Button } from "@/components/ui/Button";
-import { formatPrice } from "@/lib/utils/format";
+import { cn, formatPrice } from "@/lib/utils/format";
 import { MAX_ORDER_QUANTITY } from "@/lib/utils/order-limits";
 import { useCart } from "@/lib/cart/context";
-import { createClient } from "@/lib/supabase/client";
+import { uploadCustomerPhoto } from "@/lib/uploads/customer-photo";
 
 interface BuyNowPanelProps {
   slug: string;
@@ -19,7 +20,7 @@ interface BuyNowPanelProps {
   image?: string;
   isCustomisable?: boolean;
   allowCustomerImage?: boolean;
-  designOptions?: string[];
+  designs?: { name: string; image: string }[];
 }
 
 export function BuyNowPanel({
@@ -29,7 +30,7 @@ export function BuyNowPanel({
   image,
   isCustomisable = false,
   allowCustomerImage = false,
-  designOptions = [],
+  designs = [],
 }: BuyNowPanelProps) {
   const router = useRouter();
   const { addItem } = useCart();
@@ -51,7 +52,7 @@ export function BuyNowPanel({
     undefined;
 
   function ensureDesignSelected(): boolean {
-    if (designOptions.length === 0 || selectedDesign) return true;
+    if (designs.length === 0 || selectedDesign) return true;
     setDesignError(true);
     designPickerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
@@ -64,27 +65,11 @@ export function BuyNowPanel({
     setUploadingImage(true);
     setUploadError(null);
 
-    try {
-      const supabase = createClient();
-      const ext = file.name.split(".").pop() || "jpg";
-      const path = `customer-uploads/${crypto.randomUUID()}.${ext}`;
-
-      const { error } = await supabase.storage.from("product-images").upload(path, file, {
-        cacheControl: "3600",
-        upsert: false,
-      });
-
-      if (error) throw error;
-
-      const { data } = supabase.storage.from("product-images").getPublicUrl(path);
-      setCustomerImageUrl(data.publicUrl);
-    } catch (err) {
-      console.error("Upload error", err);
-      setUploadError("Could not upload photo. You can also share it with us on WhatsApp.");
-    } finally {
-      setUploadingImage(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
+    const result = await uploadCustomerPhoto("customer-uploads", file);
+    if (result.url) setCustomerImageUrl(result.url);
+    else setUploadError(`${result.error ?? "Could not upload photo."} You can also share it with us on WhatsApp.`);
+    setUploadingImage(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
   function handleBuyNow() {
@@ -106,31 +91,37 @@ export function BuyNowPanel({
   return (
     <>
       <div className="flex flex-col gap-4">
-        {designOptions.length > 0 && (
+        {designs.length > 0 && (
           <div ref={designPickerRef}>
             <p className="text-xs font-semibold uppercase tracking-wider text-ink">
               Select Design{selectedDesign && <span className="ml-1.5 font-normal normal-case tracking-normal text-ink-soft">— {selectedDesign}</span>}
             </p>
             <div role="radiogroup" aria-label="Design" className="mt-2 flex flex-wrap gap-2">
-              {designOptions.map((design) => {
-                const selected = design === selectedDesign;
+              {designs.map((design) => {
+                const selected = design.name === selectedDesign;
                 return (
                   <button
-                    key={design}
+                    key={design.name}
                     type="button"
                     role="radio"
                     aria-checked={selected}
                     onClick={() => {
-                      setSelectedDesign(design);
+                      setSelectedDesign(design.name);
                       setDesignError(false);
+                      if (design.image) showGalleryImage(design.image);
                     }}
-                    className={
-                      selected
-                        ? "rounded-full border border-ink bg-ink px-4 py-2 text-sm font-medium text-cream"
-                        : "rounded-full border border-ink/20 bg-white px-4 py-2 text-sm font-medium text-ink transition-colors hover:border-ink/50"
-                    }
+                    className={cn(
+                      "flex items-center gap-2 rounded-full border py-1.5 text-sm font-medium transition-colors",
+                      design.image ? "pl-1.5 pr-4" : "px-4",
+                      selected ? "border-ink bg-ink text-cream" : "border-ink/20 bg-white text-ink hover:border-ink/50",
+                    )}
                   >
-                    {design}
+                    {design.image && (
+                      <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-amber-light/40">
+                        <Image src={design.image} alt="" fill sizes="32px" className="object-cover" />
+                      </span>
+                    )}
+                    {design.name}
                   </button>
                 );
               })}
@@ -242,7 +233,7 @@ export function BuyNowPanel({
       <div className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between gap-3 border-t border-border-soft/70 bg-cream/95 p-3 backdrop-blur sm:hidden">
         <div className="flex flex-col">
           <span className="text-xs text-ink-soft">Total</span>
-          <span className="font-display text-lg font-semibold">{formatPrice(price * quantity)}</span>
+          <span className="font-sans text-lg font-semibold tabular-nums">{formatPrice(price * quantity)}</span>
         </div>
         <QuantitySelector quantity={quantity} onChange={setQuantity} max={MAX_ORDER_QUANTITY} />
         <Button onClick={handleBuyNow} className="text-xs uppercase tracking-[0.12em]">

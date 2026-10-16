@@ -82,7 +82,7 @@ export default function CartPage() {
 
       <div className="mt-8 flex items-center justify-between border-t border-border-soft/70 pt-6">
         <span className="font-display text-xl font-medium uppercase tracking-wide text-ink">Total</span>
-        <span className="font-display text-2xl font-semibold text-amber-dark">{formatPrice(totalPrice)}</span>
+        <span className="font-sans text-2xl font-semibold tabular-nums text-amber-dark">{formatPrice(totalPrice)}</span>
       </div>
       <p className="mt-2 text-right text-xs text-ink-soft">Shipping is shared on WhatsApp after you order.</p>
 

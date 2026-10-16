@@ -94,7 +94,7 @@ export default async function ProductDetailPage(props: PageProps<"/products/[slu
           <div>
             <h1 className="font-display text-3xl font-medium leading-tight text-ink sm:text-4xl">{product.name}</h1>
             <div className="mt-2 flex flex-wrap items-baseline gap-2">
-              <ProductPrice product={product} className="font-display text-2xl font-semibold text-amber-dark" />
+              <ProductPrice product={product} className="font-sans text-2xl font-semibold tabular-nums text-amber-dark" />
               {bundleSavings > 0 && (
                 <>
                   <span className="text-base text-ink-soft/60 line-through">{formatPrice(bundleSubtotal)}</span>
@@ -129,7 +129,10 @@ export default async function ProductDetailPage(props: PageProps<"/products/[slu
               image={product.images?.[0]}
               isCustomisable={product.is_customisable}
               allowCustomerImage={product.allow_customer_image}
-              designOptions={product.design_options}
+              designs={(product.design_options ?? []).map((name, i) => ({
+                name,
+                image: product.design_images?.[i] ?? "",
+              }))}
             />
             <p className="mt-4 text-sm text-ink-soft">
               Want this in a different colour, size or style?{" "}

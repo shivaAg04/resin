@@ -5,6 +5,7 @@ import { AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { FieldWrapper, Input, Select, Textarea } from "@/components/ui/Field";
 import { ImageUploader } from "@/components/admin/ImageUploader";
+import { DesignOptionsEditor, type DesignOptionRow } from "@/components/admin/DesignOptionsEditor";
 import { CategoryTagPicker } from "@/components/admin/CategoryTagPicker";
 import { BundleItemsPicker, type PickableProduct } from "@/components/admin/BundleItemsPicker";
 import { createProductAction, updateProductAction } from "@/app/admin/(protected)/products/actions";
@@ -35,7 +36,9 @@ export function ProductForm({
   const [bundleItemIds, setBundleItemIds] = useState<string[]>(product?.bundle_items.map((b) => b.product_id) ?? []);
   const [isCustomisable, setIsCustomisable] = useState(product?.is_customisable ?? false);
   const [allowCustomerImage, setAllowCustomerImage] = useState(product?.allow_customer_image ?? false);
-  const [designOptionsInput, setDesignOptionsInput] = useState((product?.design_options ?? []).join("\n"));
+  const [designs, setDesigns] = useState<DesignOptionRow[]>(
+    (product?.design_options ?? []).map((name, i) => ({ name, image: product?.design_images?.[i] ?? "" })),
+  );
   const [showInNew, setShowInNew] = useState(product?.show_in_new ?? false);
   const [badges, setBadges] = useState<string[]>(product?.badges ?? []);
   const [whatsIncluded, setWhatsIncluded] = useState(product?.whats_included ?? "");
@@ -78,7 +81,7 @@ export function ProductForm({
       discountAmount: discountValue,
       isCustomisable,
       allowCustomerImage: isCustomisable ? allowCustomerImage : false,
-      designOptions: designOptionsInput.split("\n").map((d) => d.trim()).filter(Boolean),
+      designOptions: designs.filter((d) => d.name.trim()),
       showInNew,
       badges,
       whatsIncluded: whatsIncluded.trim(),
@@ -155,17 +158,11 @@ export function ProductForm({
       </FieldWrapper>
 
       <FieldWrapper label="Design Options" htmlFor="designOptions" optional>
-        <Textarea
-          id="designOptions"
-          rows={3}
-          placeholder={"Design 1\nDesign 2\nDesign 3"}
-          value={designOptionsInput}
-          onChange={(e) => setDesignOptionsInput(e.target.value)}
-        />
-        <p className="mt-1 text-xs text-ink-soft">
-          One design per line, matching the labels on your product images. Customers must pick one
-          before adding to cart, and their choice shows on the order.
+        <p className="mb-2 text-xs text-ink-soft">
+          Add each design with its photo. Customers must pick one before adding to cart, the gallery
+          jumps to that design&apos;s photo, and their choice shows on the order.
         </p>
+        <DesignOptionsEditor designs={designs} images={images} onChange={setDesigns} />
       </FieldWrapper>
 
       <FieldWrapper label="Bundle Items" htmlFor="bundleItems" optional>

@@ -1,16 +1,33 @@
 "use client";
 
-import { useState, type KeyboardEvent } from "react";
+import { useEffect, useState, type KeyboardEvent } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils/format";
 
 const PLACEHOLDER = "/placeholder-product.svg";
 
+/** Fired by the design picker so the gallery shows the chosen design's photo. */
+export const SHOW_GALLERY_IMAGE_EVENT = "product-gallery:show";
+
+export function showGalleryImage(src: string) {
+  window.dispatchEvent(new CustomEvent(SHOW_GALLERY_IMAGE_EVENT, { detail: src }));
+}
+
 export function ImageGallery({ images, alt }: { images: string[]; alt: string }) {
   const gallery = images.length > 0 ? images : [PLACEHOLDER];
   const [active, setActive] = useState(0);
   const hasMultiple = gallery.length > 1;
+
+  useEffect(() => {
+    function handleShow(event: Event) {
+      // `gallery` only differs from `images` when it's the placeholder, which never matches.
+      const index = images.indexOf((event as CustomEvent<string>).detail);
+      if (index >= 0) setActive(index);
+    }
+    window.addEventListener(SHOW_GALLERY_IMAGE_EVENT, handleShow);
+    return () => window.removeEventListener(SHOW_GALLERY_IMAGE_EVENT, handleShow);
+  }, [images]);
 
   function goTo(index: number) {
     setActive((index + gallery.length) % gallery.length);
