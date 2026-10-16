@@ -19,6 +19,7 @@ interface BuyNowPanelProps {
   image?: string;
   isCustomisable?: boolean;
   allowCustomerImage?: boolean;
+  designOptions?: string[];
 }
 
 export function BuyNowPanel({
@@ -28,6 +29,7 @@ export function BuyNowPanel({
   image,
   isCustomisable = false,
   allowCustomerImage = false,
+  designOptions = [],
 }: BuyNowPanelProps) {
   const router = useRouter();
   const { addItem } = useCart();
@@ -38,6 +40,22 @@ export function BuyNowPanel({
   const [customerImageUrl, setCustomerImageUrl] = useState("");
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [selectedDesign, setSelectedDesign] = useState("");
+  const [designError, setDesignError] = useState(false);
+  const designPickerRef = useRef<HTMLDivElement>(null);
+
+  // The chosen design rides along in the customization note so it flows
+  // through cart, checkout, the order record and admin without extra columns.
+  const customization =
+    [selectedDesign && `Design: ${selectedDesign}`, customizationText.trim()].filter(Boolean).join(" | ") ||
+    undefined;
+
+  function ensureDesignSelected(): boolean {
+    if (designOptions.length === 0 || selectedDesign) return true;
+    setDesignError(true);
+    designPickerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    return false;
+  }
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -70,13 +88,14 @@ export function BuyNowPanel({
   }
 
   function handleBuyNow() {
+    if (!ensureDesignSelected()) return;
     addItem(
       {
         productSlug: slug,
         name,
         price,
         image,
-        customization: customizationText.trim() || undefined,
+        customization,
         customerImageUrl: customerImageUrl || undefined,
       },
       quantity,
@@ -87,6 +106,39 @@ export function BuyNowPanel({
   return (
     <>
       <div className="flex flex-col gap-4">
+        {designOptions.length > 0 && (
+          <div ref={designPickerRef}>
+            <p className="text-xs font-semibold uppercase tracking-wider text-ink">
+              Select Design{selectedDesign && <span className="ml-1.5 font-normal normal-case tracking-normal text-ink-soft">— {selectedDesign}</span>}
+            </p>
+            <div role="radiogroup" aria-label="Design" className="mt-2 flex flex-wrap gap-2">
+              {designOptions.map((design) => {
+                const selected = design === selectedDesign;
+                return (
+                  <button
+                    key={design}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    onClick={() => {
+                      setSelectedDesign(design);
+                      setDesignError(false);
+                    }}
+                    className={
+                      selected
+                        ? "rounded-full border border-ink bg-ink px-4 py-2 text-sm font-medium text-cream"
+                        : "rounded-full border border-ink/20 bg-white px-4 py-2 text-sm font-medium text-ink transition-colors hover:border-ink/50"
+                    }
+                  >
+                    {design}
+                  </button>
+                );
+              })}
+            </div>
+            {designError && <p className="mt-1.5 text-xs text-red-600">Please select a design to continue.</p>}
+          </div>
+        )}
+
         {/* Customization Details Box */}
         {isCustomisable && (
           <div className="rounded-2xl border border-amber/35 bg-gradient-to-br from-lilac/60 via-cream to-amber-light/30 p-4 shadow-sm">
@@ -179,8 +231,9 @@ export function BuyNowPanel({
           price={price}
           image={image}
           quantity={quantity}
-          customization={customizationText.trim() || undefined}
+          customization={customization}
           customerImageUrl={customerImageUrl || undefined}
+          onBeforeAdd={ensureDesignSelected}
           className="h-13 w-full text-xs uppercase tracking-[0.12em]"
         />
       </div>

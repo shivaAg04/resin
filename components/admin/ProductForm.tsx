@@ -35,6 +35,7 @@ export function ProductForm({
   const [bundleItemIds, setBundleItemIds] = useState<string[]>(product?.bundle_items.map((b) => b.product_id) ?? []);
   const [isCustomisable, setIsCustomisable] = useState(product?.is_customisable ?? false);
   const [allowCustomerImage, setAllowCustomerImage] = useState(product?.allow_customer_image ?? false);
+  const [designOptionsInput, setDesignOptionsInput] = useState((product?.design_options ?? []).join("\n"));
   const [showInNew, setShowInNew] = useState(product?.show_in_new ?? false);
   const [badges, setBadges] = useState<string[]>(product?.badges ?? []);
   const [whatsIncluded, setWhatsIncluded] = useState(product?.whats_included ?? "");
@@ -77,6 +78,7 @@ export function ProductForm({
       discountAmount: discountValue,
       isCustomisable,
       allowCustomerImage: isCustomisable ? allowCustomerImage : false,
+      designOptions: designOptionsInput.split("\n").map((d) => d.trim()).filter(Boolean),
       showInNew,
       badges,
       whatsIncluded: whatsIncluded.trim(),
@@ -150,6 +152,20 @@ export function ProductForm({
 
       <FieldWrapper label="Product Images" htmlFor="images">
         <ImageUploader images={images} onChange={setImages} />
+      </FieldWrapper>
+
+      <FieldWrapper label="Design Options" htmlFor="designOptions" optional>
+        <Textarea
+          id="designOptions"
+          rows={3}
+          placeholder={"Design 1\nDesign 2\nDesign 3"}
+          value={designOptionsInput}
+          onChange={(e) => setDesignOptionsInput(e.target.value)}
+        />
+        <p className="mt-1 text-xs text-ink-soft">
+          One design per line, matching the labels on your product images. Customers must pick one
+          before adding to cart, and their choice shows on the order.
+        </p>
       </FieldWrapper>
 
       <FieldWrapper label="Bundle Items" htmlFor="bundleItems" optional>

@@ -54,6 +54,7 @@ export interface Product {
   reel_url_2?: string | null;
   is_customisable: boolean;
   allow_customer_image?: boolean;
+  design_options?: string[];
   keywords?: string[];
   show_in_new: boolean;
   /** See lib/products/badges.ts. Missing on rows read before migration 0012. */
@@ -79,6 +80,7 @@ export type ProductInput = {
   discountAmount?: number;
   isCustomisable?: boolean;
   allowCustomerImage?: boolean;
+  designOptions?: string[];
   showInNew?: boolean;
   badges?: string[];
   whatsIncluded?: string;

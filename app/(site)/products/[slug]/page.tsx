@@ -129,6 +129,7 @@ export default async function ProductDetailPage(props: PageProps<"/products/[slu
               image={product.images?.[0]}
               isCustomisable={product.is_customisable}
               allowCustomerImage={product.allow_customer_image}
+              designOptions={product.design_options}
             />
             <p className="mt-4 text-sm text-ink-soft">
               Want this in a different colour, size or style?{" "}

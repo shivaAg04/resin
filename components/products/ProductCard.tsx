@@ -38,7 +38,7 @@ export function ProductCard({ product, compact = false }: { product: Product; co
             {ribbon}
           </span>
         )}
-        {!compact && (
+        {!compact && !product.design_options?.length && (
           <AddToCartButton
             productSlug={product.slug}
             name={product.name}

@@ -28,6 +28,7 @@ function mapProductRow(row: Record<string, unknown>): Product {
     keywords: Array.isArray(rest.keywords) ? (rest.keywords as string[]) : [],
     reel_url_2: (rest.reel_url_2 as string) || null,
     allow_customer_image: Boolean(rest.allow_customer_image),
+    design_options: Array.isArray(rest.design_options) ? (rest.design_options as string[]) : [],
     categories: (product_categories ?? []).map((pc) => pc.categories).filter((c): c is Category => Boolean(c)),
     // Only populated for single-product fetches (getProductBySlug /
     // getProductByIdAdmin) — listing queries don't need this extra join.
@@ -581,6 +582,7 @@ export async function createProduct(input: ProductInput): Promise<{ product?: Pr
       reel_url_2: input.reelUrl2 ? normalizeReelUrl(input.reelUrl2) : null,
       is_customisable: input.isCustomisable ?? false,
       allow_customer_image: input.allowCustomerImage ?? false,
+      design_options: (input.designOptions ?? []).map((d) => d.trim()).filter(Boolean),
       keywords: (input.keywords ?? []).map((k) => k.trim()).filter(Boolean),
       show_in_new: input.showInNew ?? false,
       badges: (input.badges ?? []).filter(isProductBadge),
@@ -638,6 +640,7 @@ export async function updateProduct(
       reel_url_2: input.reelUrl2 ? normalizeReelUrl(input.reelUrl2) : null,
       is_customisable: input.isCustomisable ?? false,
       allow_customer_image: input.allowCustomerImage ?? false,
+      design_options: (input.designOptions ?? []).map((d) => d.trim()).filter(Boolean),
       keywords: (input.keywords ?? []).map((k) => k.trim()).filter(Boolean),
       show_in_new: input.showInNew ?? false,
       badges: (input.badges ?? []).filter(isProductBadge),

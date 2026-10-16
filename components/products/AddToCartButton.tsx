@@ -13,6 +13,8 @@ interface AddToCartButtonProps {
   customization?: string;
   customerImageUrl?: string;
   className?: string;
+  /** Runs before adding; return false to cancel (e.g. a required design isn't picked yet). */
+  onBeforeAdd?: () => boolean;
   /** Compact icon-only style, used on the product card overlay; the PDP uses the full labeled version. */
   iconOnly?: boolean;
 }
@@ -26,6 +28,7 @@ export function AddToCartButton({
   customization,
   customerImageUrl,
   className,
+  onBeforeAdd,
   iconOnly = false,
 }: AddToCartButtonProps) {
   const { items, addItem, updateQuantity } = useCart();
@@ -39,6 +42,7 @@ export function AddToCartButton({
 
   function handleAdd(event: React.MouseEvent) {
     stop(event);
+    if (onBeforeAdd && !onBeforeAdd()) return;
     addItem({ productSlug, name, price, image, customization, customerImageUrl }, quantity);
   }
 
