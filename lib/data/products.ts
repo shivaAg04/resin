@@ -25,6 +25,9 @@ function mapProductRow(row: Record<string, unknown>): Product {
   return {
     ...(rest as Omit<Product, "categories" | "bundle_items">),
     badges: Array.isArray(rest.badges) ? (rest.badges as string[]) : [],
+    keywords: Array.isArray(rest.keywords) ? (rest.keywords as string[]) : [],
+    reel_url_2: (rest.reel_url_2 as string) || null,
+    allow_customer_image: Boolean(rest.allow_customer_image),
     categories: (product_categories ?? []).map((pc) => pc.categories).filter((c): c is Category => Boolean(c)),
     // Only populated for single-product fetches (getProductBySlug /
     // getProductByIdAdmin) — listing queries don't need this extra join.
@@ -147,20 +150,26 @@ async function searchActiveProducts(query: string, categorySlug?: string): Promi
     const supabase = createCachedPublicClient();
 
     if (categorySlug) {
-      // Already scoped to one category — no category-vs-title priority to resolve.
+      // Already scoped to one category — match title or keywords.
       const { data, error } = await supabase
         .from("products")
         .select("*, product_categories!inner(categories!inner(*))")
         .eq("is_active", true)
         .eq("product_categories.categories.slug", categorySlug)
-        .ilike("name", term)
         .order("sort_order", { ascending: true });
 
       if (error) throw error;
-      return (data as Record<string, unknown>[]).map(mapProductRow);
+      const lower = query.toLowerCase().trim();
+      return (data as Record<string, unknown>[])
+        .map(mapProductRow)
+        .filter(
+          (p) =>
+            p.name.toLowerCase().includes(lower) ||
+            (p.keywords ?? []).some((k) => k.toLowerCase().includes(lower)),
+        );
     }
 
-    const [byCategory, byTitle] = await Promise.all([
+    const [byCategory, byTitle, allActive] = await Promise.all([
       supabase
         .from("products")
         .select("*, product_categories!inner(categories!inner(*))")
@@ -173,10 +182,20 @@ async function searchActiveProducts(query: string, categorySlug?: string): Promi
         .eq("is_active", true)
         .ilike("name", term)
         .order("sort_order", { ascending: true }),
+      supabase
+        .from("products")
+        .select(PRODUCT_WITH_CATEGORIES_SELECT)
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true }),
     ]);
 
     if (byCategory.error) throw byCategory.error;
     if (byTitle.error) throw byTitle.error;
+
+    const lower = query.toLowerCase().trim();
+    const byKeywords = (allActive.data ?? [])
+      .map((r) => mapProductRow(r as Record<string, unknown>))
+      .filter((p) => (p.keywords ?? []).some((k) => k.toLowerCase().includes(lower)));
 
     const seen = new Set<string>();
     const results: Product[] = [];
@@ -186,17 +205,23 @@ async function searchActiveProducts(query: string, categorySlug?: string): Promi
       seen.add(product.id);
       results.push(product);
     }
+    for (const product of byKeywords) {
+      if (seen.has(product.id)) continue;
+      seen.add(product.id);
+      results.push(product);
+    }
     return results;
   } catch (error) {
     warnMockDataFallback(error);
-    const lower = query.toLowerCase();
+    const lower = query.toLowerCase().trim();
     const inCategory = (p: Product) => p.categories.some((c) => c.name.toLowerCase().includes(lower));
     const inTitle = (p: Product) => p.name.toLowerCase().includes(lower);
+    const inKeywords = (p: Product) => (p.keywords ?? []).some((k) => k.toLowerCase().includes(lower));
     const pool = MOCK_PRODUCTS.filter(
       (p) => !categorySlug || p.categories.some((c) => c.slug === categorySlug),
     );
     const byCategory = pool.filter(inCategory);
-    const byTitle = pool.filter((p) => inTitle(p) && !inCategory(p));
+    const byTitle = pool.filter((p) => (inTitle(p) || inKeywords(p)) && !inCategory(p));
     return [...byCategory, ...byTitle];
   }
 }
@@ -553,7 +578,10 @@ export async function createProduct(input: ProductInput): Promise<{ product?: Pr
       is_active: input.is_active,
       images: input.images,
       reel_url: input.reelUrl ? normalizeReelUrl(input.reelUrl) : null,
+      reel_url_2: input.reelUrl2 ? normalizeReelUrl(input.reelUrl2) : null,
       is_customisable: input.isCustomisable ?? false,
+      allow_customer_image: input.allowCustomerImage ?? false,
+      keywords: (input.keywords ?? []).map((k) => k.trim()).filter(Boolean),
       show_in_new: input.showInNew ?? false,
       badges: (input.badges ?? []).filter(isProductBadge),
       whats_included: input.whatsIncluded?.trim() || null,
@@ -607,7 +635,10 @@ export async function updateProduct(
       is_active: input.is_active,
       images: input.images,
       reel_url: input.reelUrl ? normalizeReelUrl(input.reelUrl) : null,
+      reel_url_2: input.reelUrl2 ? normalizeReelUrl(input.reelUrl2) : null,
       is_customisable: input.isCustomisable ?? false,
+      allow_customer_image: input.allowCustomerImage ?? false,
+      keywords: (input.keywords ?? []).map((k) => k.trim()).filter(Boolean),
       show_in_new: input.showInNew ?? false,
       badges: (input.badges ?? []).filter(isProductBadge),
       whats_included: input.whatsIncluded?.trim() || null,
@@ -700,6 +731,11 @@ export function getDisplayReelsForProduct(product: Product): DisplayReel[] {
   if (product.reel_url) {
     reels.push({ url: product.reel_url, caption: product.name });
     seen.add(product.reel_url);
+  }
+
+  if (product.reel_url_2 && !seen.has(product.reel_url_2)) {
+    reels.push({ url: product.reel_url_2, caption: product.name });
+    seen.add(product.reel_url_2);
   }
 
   for (const item of product.bundle_items) {

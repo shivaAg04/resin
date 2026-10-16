@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ImageGallery } from "@/components/products/ImageGallery";
 import { BuyNowPanel } from "@/components/products/BuyNowPanel";
 import { ProductImage } from "@/components/products/ProductImage";
-import { ReviewsCarousel } from "@/components/products/ReviewsCarousel";
+import { ProductReviewsSection } from "@/components/products/ProductReviewsSection";
 import { InstagramEmbed } from "@/components/InstagramEmbed";
 import { InstagramEmbedsLoader } from "@/components/InstagramEmbedsLoader";
 import { Badge } from "@/components/ui/Badge";
@@ -127,6 +127,8 @@ export default async function ProductDetailPage(props: PageProps<"/products/[slu
               name={product.name}
               price={Number(product.price)}
               image={product.images?.[0]}
+              isCustomisable={product.is_customisable}
+              allowCustomerImage={product.allow_customer_image}
             />
             <p className="mt-4 text-sm text-ink-soft">
               Want this in a different colour, size or style?{" "}
@@ -186,11 +188,14 @@ export default async function ProductDetailPage(props: PageProps<"/products/[slu
         </div>
       </div>
 
-      {reviews.length > 0 && (
-        <div className="mt-14 border-t border-border-soft/70 pt-10">
-          <ReviewsCarousel title="Customer Reviews" reviews={reviews} />
-        </div>
-      )}
+      <div className="mt-14 border-t border-border-soft/70 pt-10">
+        <ProductReviewsSection
+          productId={product.id}
+          productSlug={product.slug}
+          productName={product.name}
+          reviews={reviews}
+        />
+      </div>
     </div>
   );
 }

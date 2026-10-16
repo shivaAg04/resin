@@ -77,6 +77,7 @@ export async function SiteFooter() {
           <FooterColumn
             title="Help"
             links={[
+              { href: "/track-order", label: "Track Your Order" },
               { href: "/faq", label: "FAQs" },
               { href: "/reviews", label: "Reviews" },
               { href: "/shipping-policy", label: "Shipping" },

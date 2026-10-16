@@ -37,6 +37,13 @@ export const metadata: Metadata = {
     siteName: "Spilled Colours",
     type: "website",
   },
+  icons: {
+    icon: [
+      { url: "/icon.png", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: "/apple-icon.png",
+  },
   twitter: {
     card: "summary_large_image",
   },

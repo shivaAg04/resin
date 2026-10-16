@@ -15,7 +15,7 @@ export const BUSINESS = {
   address: process.env.NEXT_PUBLIC_BUSINESS_ADDRESS ?? "",
   email: "spilled.colours.sc@gmail.com",
   jurisdictionCity: process.env.NEXT_PUBLIC_BUSINESS_CITY ?? "",
-  lastUpdated: "6 October 2026",
+  lastUpdated: "16 October 2026",
   supportHours: "Monday to Saturday, 12 PM to 7 PM IST",
 } as const;
 

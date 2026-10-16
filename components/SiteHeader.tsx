@@ -31,7 +31,7 @@ export async function SiteHeader() {
             </Link>
           </div>
 
-          <nav aria-label="Main" className="hidden items-center gap-8 lg:flex">
+          <nav aria-label="Main" className="hidden items-center gap-6 xl:gap-8 lg:flex">
             {/* Pure-CSS dropdown: opens on hover and on keyboard focus. */}
             <div className="group relative">
               <Link href="/products" className={`${navLinkClasses} flex items-center gap-1`}>

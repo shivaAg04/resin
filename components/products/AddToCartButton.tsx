@@ -10,6 +10,8 @@ interface AddToCartButtonProps {
   price: number;
   image?: string;
   quantity?: number;
+  customization?: string;
+  customerImageUrl?: string;
   className?: string;
   /** Compact icon-only style, used on the product card overlay; the PDP uses the full labeled version. */
   iconOnly?: boolean;
@@ -21,6 +23,8 @@ export function AddToCartButton({
   price,
   image,
   quantity = 1,
+  customization,
+  customerImageUrl,
   className,
   iconOnly = false,
 }: AddToCartButtonProps) {
@@ -35,7 +39,7 @@ export function AddToCartButton({
 
   function handleAdd(event: React.MouseEvent) {
     stop(event);
-    addItem({ productSlug, name, price, image }, quantity);
+    addItem({ productSlug, name, price, image, customization, customerImageUrl }, quantity);
   }
 
   function handleIncrement(event: React.MouseEvent) {

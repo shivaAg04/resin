@@ -137,7 +137,26 @@ export default async function AdminOrderDetailPage(props: PageProps<"/admin/orde
           <tbody>
             {order.order_items.map((item) => (
               <tr key={item.id} className="border-b border-border-soft/40 last:border-0">
-                <td className="px-5 py-3 text-ink">{item.product_name}</td>
+                <td className="px-5 py-3 text-ink">
+                  <span className="font-medium">{item.product_name}</span>
+                  {item.customer_customization && (
+                    <div className="mt-1.5 rounded-lg border border-amber/30 bg-amber-light/20 p-2 text-xs text-ink">
+                      <span className="font-semibold text-amber-dark">Customization:</span> {item.customer_customization}
+                    </div>
+                  )}
+                  {item.customer_image_url && (
+                    <div className="mt-1.5 flex items-center gap-2">
+                      <a
+                        href={item.customer_image_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 rounded border border-ink/20 bg-cream px-2 py-0.5 text-xs text-ink hover:border-ink"
+                      >
+                        View Reference Photo ↗
+                      </a>
+                    </div>
+                  )}
+                </td>
                 <td className="px-5 py-3 text-ink-soft">{item.quantity}</td>
                 <td className="px-5 py-3 tabular-nums text-ink-soft">{formatPrice(Number(item.unit_price))}</td>
                 <td className="px-5 py-3 tabular-nums text-ink">{formatPrice(Number(item.subtotal))}</td>

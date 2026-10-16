@@ -8,6 +8,8 @@ export interface OrderSummaryItem {
   image?: string;
   price: number;
   quantity: number;
+  customization?: string;
+  customerImageUrl?: string;
 }
 
 export function OrderSummary({ items }: { items: OrderSummaryItem[] }) {
@@ -18,11 +20,19 @@ export function OrderSummary({ items }: { items: OrderSummaryItem[] }) {
       <h2 className="font-display text-xl font-medium uppercase tracking-wide text-ink">Order Summary</h2>
 
       <div className="mt-4 flex flex-col gap-4">
-        {items.map((item) => (
-          <div key={item.productSlug} className="flex items-center gap-4">
+        {items.map((item, index) => (
+          <div key={`${item.productSlug}-${index}`} className="flex items-center gap-4">
             <ProductImage src={item.image} alt={item.name} className="h-16 w-16 shrink-0 rounded-md" />
             <div className="flex-1">
               <p className="font-medium text-ink">{item.name}</p>
+              {item.customization && (
+                <p className="mt-0.5 text-xs text-amber-dark">
+                  Note: {item.customization}
+                </p>
+              )}
+              {item.customerImageUrl && (
+                <p className="text-[11px] text-ink-soft">📷 Reference photo attached</p>
+              )}
               <p className="text-sm text-ink-soft">
                 {formatPrice(item.price)} × {item.quantity}
               </p>

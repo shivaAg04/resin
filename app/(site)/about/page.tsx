@@ -20,29 +20,36 @@ export default async function AboutPage() {
     <div>
       <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-2 lg:gap-16">
         <div>
-          <Eyebrow>Our story</Eyebrow>
+          <Eyebrow>About Us</Eyebrow>
           <h1 className="mt-3 font-display text-4xl font-medium leading-[1.05] text-ink sm:text-5xl">
-            More than resin.
+            We don&apos;t just make products.
             <br />
-            It&apos;s the idea behind it.
+            We create your ideas.
           </h1>
           <div className="mt-6 space-y-4 text-[15px] leading-relaxed text-ink-soft">
-            <p>
-              Spilled Colours started with resin and a lot of experimenting. What began as a small creative hobby
-              slowly turned into a business built around one thing we love most — creating pieces that don&apos;t have
-              to look like everything else.
+            <p className="text-base font-medium text-ink">
+              Spilled Colours is a premium resin customization brand where creativity has no fixed format.
             </p>
             <p>
-              Sometimes customers come with a screenshot, a colour combination, a memory, an occasion or simply an
-              idea they&apos;ve imagined. And sometimes, they don&apos;t know exactly what they want yet.
+              What started with resin evolved into a space where ideas, colours, occasions and imagination come together to create something completely personal.
             </p>
-            <p className="font-medium text-ink">That&apos;s where we come in.</p>
             <p>
-              Every piece is mixed, poured, sanded and finished by hand — one at a time — and we share photos of it
-              with you before it ever leaves our studio.
+              From everyday keepsakes to statement pieces, festive collections, personalised gifting and bulk orders — every creation is made with a purpose: to make something that feels like it was made for you, and only you.
+            </p>
+            <p>
+              We love taking an idea that exists only in your mind, adding our creativity to it, and turning it into something tangible.
+            </p>
+            <p className="italic text-ink-soft/90">
+              Because we don&apos;t believe in &ldquo;this is what we have.&rdquo;
+            </p>
+            <p className="font-medium text-ink">
+              We believe in: &ldquo;Tell us what you have in mind.&rdquo;
+            </p>
+            <p className="font-display text-lg font-medium text-amber-dark">
+              That&apos;s Spilled Colours. Bold. Personal. Unconventional.
             </p>
           </div>
-          <p className="mt-6 rotate-[-3deg] font-script text-3xl text-amber-dark">Let&apos;s create something beautiful</p>
+          <p className="mt-6 rotate-[-3deg] font-script text-3xl text-amber-dark">Your idea. Our creativity. ♡</p>
         </div>
 
         <div className="grid grid-cols-2 gap-3">

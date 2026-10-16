@@ -51,7 +51,10 @@ export interface Product {
   categories: Category[];
   sort_order: number;
   reel_url: string | null;
+  reel_url_2?: string | null;
   is_customisable: boolean;
+  allow_customer_image?: boolean;
+  keywords?: string[];
   show_in_new: boolean;
   /** See lib/products/badges.ts. Missing on rows read before migration 0012. */
   badges: string[];
@@ -70,9 +73,12 @@ export type ProductInput = {
   is_active: boolean;
   images: string[];
   reelUrl?: string;
+  reelUrl2?: string;
+  keywords?: string[];
   bundleItemIds?: string[];
   discountAmount?: number;
   isCustomisable?: boolean;
+  allowCustomerImage?: boolean;
   showInNew?: boolean;
   badges?: string[];
   whatsIncluded?: string;
@@ -145,6 +151,8 @@ export interface OrderItem {
   quantity: number;
   unit_price: number;
   subtotal: number;
+  customer_customization?: string | null;
+  customer_image_url?: string | null;
 }
 
 export interface OrderWithItems extends Order {

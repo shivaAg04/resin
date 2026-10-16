@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
+import { SaveOrderOnSuccess } from "@/components/orders/SaveOrderOnSuccess";
+
 export default async function OrderSuccessPage(props: PageProps<"/order-success/[orderNumber]">) {
   const { orderNumber } = await props.params;
   const searchParams = await props.searchParams;
@@ -33,6 +35,13 @@ export default async function OrderSuccessPage(props: PageProps<"/order-success/
 
   return (
     <div className="mx-auto flex max-w-lg flex-col items-center px-4 py-16 text-center sm:py-24">
+      {confirmation?.whatsappNumber && (
+        <SaveOrderOnSuccess
+          orderNumber={orderNumber}
+          phone={confirmation.whatsappNumber}
+        />
+      )}
+
       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-lilac text-amber-dark">
         <CheckCircle2 className="h-9 w-9" strokeWidth={1.5} />
       </div>
@@ -71,6 +80,9 @@ export default async function OrderSuccessPage(props: PageProps<"/order-success/
       </p>
 
       <div className="mt-6 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
+        <ButtonLink href={`/track-order?order=${orderNumber}`} variant="primary" size="lg" className="text-xs uppercase tracking-[0.12em]">
+          Track Order Status
+        </ButtonLink>
         <ButtonLink href={whatsappUrl} target="_blank" rel="noopener noreferrer" variant="whatsapp" size="lg" className="text-xs uppercase tracking-[0.12em]">
           <WhatsAppIcon className="h-4 w-4" /> Chat on WhatsApp
         </ButtonLink>

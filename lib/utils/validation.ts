@@ -49,6 +49,8 @@ export const customerDetailsSchema = z.object({
 export const cartItemSchema = z.object({
   productSlug: z.string().trim().min(1, "Product is required"),
   quantity: z.coerce.number().int().min(1, "Quantity must be at least 1").max(MAX_ORDER_QUANTITY),
+  customization: z.string().trim().max(1000).optional(),
+  customerImageUrl: z.string().trim().optional(),
 });
 
 export const createOrderSchema = customerDetailsSchema.extend({

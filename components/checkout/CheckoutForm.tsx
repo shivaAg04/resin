@@ -67,6 +67,8 @@ interface SingleProduct {
   productImage?: string;
   price: number;
   initialQuantity: number;
+  customization?: string;
+  customerImageUrl?: string;
 }
 
 interface CheckoutFormProps {
@@ -115,6 +117,8 @@ export function CheckoutForm({ single }: CheckoutFormProps) {
           image: single.productImage,
           price: single.price,
           quantity,
+          customization: single.customization,
+          customerImageUrl: single.customerImageUrl,
         },
       ]
     : cart.items.map((item) => ({
@@ -123,6 +127,8 @@ export function CheckoutForm({ single }: CheckoutFormProps) {
         image: item.image,
         price: item.price,
         quantity: item.quantity,
+        customization: item.customization,
+        customerImageUrl: item.customerImageUrl,
       }));
 
   const orderDescription = single
@@ -141,7 +147,12 @@ export function CheckoutForm({ single }: CheckoutFormProps) {
   }
 
   function itemsPayload() {
-    return checkoutItems.map(({ productSlug, quantity }) => ({ productSlug, quantity }));
+    return checkoutItems.map(({ productSlug, quantity, customization, customerImageUrl }) => ({
+      productSlug,
+      quantity,
+      customization,
+      customerImageUrl,
+    }));
   }
 
   async function payOnline(parsedForm: CustomerDetailsInput) {

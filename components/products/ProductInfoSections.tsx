@@ -90,6 +90,20 @@ export function ProductInfoSections({ product }: { product: Product }) {
         </Link>
       </Disclosure>
 
+      <Disclosure title="Returns & Exchanges">
+        <p>
+          Every Spilled Colours piece is handmade and customized specifically for you, so we do not accept returns or
+          exchanges for change of mind.
+        </p>
+        <p className="mt-2 text-xs text-ink-soft">
+          If your item arrives damaged, defective, or materially different from the approved design, please contact us
+          within {POLICY.damageReportHours} hours of delivery with clear photos and an uncut unboxing video.
+        </p>
+        <Link href="/refund-policy" className="mt-2 inline-block font-medium text-ink underline underline-offset-2 hover:text-amber-dark">
+          Read full Refund &amp; Cancellation Policy →
+        </Link>
+      </Disclosure>
+
       <Disclosure title="Bulk Orders">
         <p>Need this for a wedding, festive gifting or your team? We do bulk and corporate orders with custom details.</p>
         <Link href="/bulk-orders" className="mt-2 inline-block text-ink underline-offset-2 hover:underline">

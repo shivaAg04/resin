@@ -4,11 +4,18 @@ import { useSyncExternalStore } from "react";
 import { MAX_ORDER_QUANTITY } from "@/lib/utils/order-limits";
 
 export interface CartItem {
+  id?: string;
   productSlug: string;
   name: string;
   price: number;
   image?: string;
   quantity: number;
+  customization?: string;
+  customerImageUrl?: string;
+}
+
+export function itemKey(item: { productSlug: string; customization?: string; customerImageUrl?: string }): string {
+  return `${item.productSlug}::${item.customization ?? ""}::${item.customerImageUrl ?? ""}`;
 }
 
 const STORAGE_KEY = "resin-cart";
@@ -74,31 +81,34 @@ function getServerSnapshot() {
 
 export function addToCart(item: Omit<CartItem, "quantity">, quantity = 1) {
   ensureInitialized();
-  const existing = items.find((i) => i.productSlug === item.productSlug);
+  const key = itemKey(item);
+  const existing = items.find((i) => itemKey(i) === key);
   items = existing
     ? items.map((i) =>
-        i.productSlug === item.productSlug
+        itemKey(i) === key
           ? { ...i, quantity: Math.min(MAX_ORDER_QUANTITY, i.quantity + quantity) }
           : i,
       )
-    : [...items, { ...item, quantity: Math.min(MAX_ORDER_QUANTITY, quantity) }];
+    : [...items, { ...item, id: item.id ?? (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : String(Date.now())), quantity: Math.min(MAX_ORDER_QUANTITY, quantity) }];
   notify();
 }
 
-export function removeFromCart(productSlug: string) {
+export function removeFromCart(identifier: string) {
   ensureInitialized();
-  items = items.filter((i) => i.productSlug !== productSlug);
+  items = items.filter((i) => i.id !== identifier && itemKey(i) !== identifier && i.productSlug !== identifier);
   notify();
 }
 
-export function updateCartQuantity(productSlug: string, quantity: number) {
+export function updateCartQuantity(identifier: string, quantity: number) {
   if (quantity < 1) {
-    removeFromCart(productSlug);
+    removeFromCart(identifier);
     return;
   }
   ensureInitialized();
   items = items.map((i) =>
-    i.productSlug === productSlug ? { ...i, quantity: Math.min(MAX_ORDER_QUANTITY, quantity) } : i,
+    i.id === identifier || itemKey(i) === identifier || i.productSlug === identifier
+      ? { ...i, quantity: Math.min(MAX_ORDER_QUANTITY, quantity) }
+      : i,
   );
   notify();
 }

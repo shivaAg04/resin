@@ -29,6 +29,8 @@ export async function createOrderFromCheckout(
     quantity: number;
     unitPrice: number;
     subtotal: number;
+    customerCustomization: string | null;
+    customerImageUrl: string | null;
   }[] = [];
 
   for (const line of input.items) {
@@ -38,7 +40,15 @@ export async function createOrderFromCheckout(
     }
     const unitPrice = Number(product.price);
     const subtotal = Math.round(unitPrice * line.quantity * 100) / 100;
-    resolvedItems.push({ productId: product.id, productName: product.name, quantity: line.quantity, unitPrice, subtotal });
+    resolvedItems.push({
+      productId: product.id,
+      productName: product.name,
+      quantity: line.quantity,
+      unitPrice,
+      subtotal,
+      customerCustomization: line.customization?.trim() || null,
+      customerImageUrl: line.customerImageUrl?.trim() || null,
+    });
   }
 
   const totalAmount = Math.round(resolvedItems.reduce((sum, item) => sum + item.subtotal, 0) * 100) / 100;
@@ -77,6 +87,8 @@ export async function createOrderFromCheckout(
       quantity: item.quantity,
       unit_price: item.unitPrice,
       subtotal: item.subtotal,
+      customer_customization: item.customerCustomization,
+      customer_image_url: item.customerImageUrl,
     })),
   );
 

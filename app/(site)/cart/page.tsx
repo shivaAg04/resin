@@ -30,41 +30,54 @@ export default function CartPage() {
       <h1 className="font-display text-4xl font-medium text-ink">Your Cart</h1>
 
       <div className="mt-8 flex flex-col gap-4">
-        {items.map((item) => (
-          <div
-            key={item.productSlug}
-            className="flex flex-col gap-3 rounded-lg border border-border-soft/70 bg-white p-4 sm:flex-row sm:items-center"
-          >
-            <div className="flex flex-1 items-center gap-4">
-              <ProductImage src={item.image} alt={item.name} className="h-20 w-20 shrink-0 rounded-md" />
-              <div className="min-w-0 flex-1">
-                <Link href={`/products/${item.productSlug}`} className="block truncate font-display text-lg font-medium text-ink hover:text-amber-dark">
-                  {item.name}
-                </Link>
-                <p className="text-sm text-ink-soft">{formatPrice(item.price)}</p>
+        {items.map((item, index) => {
+          const itemIdentifier = item.id || `${item.productSlug}-${index}`;
+          return (
+            <div
+              key={itemIdentifier}
+              className="flex flex-col gap-3 rounded-lg border border-border-soft/70 bg-white p-4 sm:flex-row sm:items-center"
+            >
+              <div className="flex flex-1 items-center gap-4">
+                <ProductImage src={item.image} alt={item.name} className="h-20 w-20 shrink-0 rounded-md" />
+                <div className="min-w-0 flex-1">
+                  <Link href={`/products/${item.productSlug}`} className="block truncate font-display text-lg font-medium text-ink hover:text-amber-dark">
+                    {item.name}
+                  </Link>
+                  <p className="text-sm text-ink-soft">{formatPrice(item.price)}</p>
+                  {item.customization && (
+                    <div className="mt-1.5 rounded-lg border border-amber/30 bg-amber-light/20 p-2 text-xs text-ink">
+                      <span className="font-semibold text-amber-dark">Customization:</span> {item.customization}
+                    </div>
+                  )}
+                  {item.customerImageUrl && (
+                    <p className="mt-1 text-xs text-ink-soft">
+                      📷 Reference photo attached
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 sm:justify-end">
+                <QuantitySelector
+                  quantity={item.quantity}
+                  onChange={(next) => updateQuantity(item.id || item.productSlug, Math.min(MAX_ORDER_QUANTITY, next))}
+                  max={MAX_ORDER_QUANTITY}
+                />
+                <p className="w-20 text-right text-sm font-medium tabular-nums text-ink">
+                  {formatPrice(item.price * item.quantity)}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => removeItem(item.id || item.productSlug)}
+                  aria-label={`Remove ${item.name} from cart`}
+                  className="text-ink-soft transition-colors hover:text-red-600"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
               </div>
             </div>
-
-            <div className="flex items-center justify-between gap-3 sm:justify-end">
-              <QuantitySelector
-                quantity={item.quantity}
-                onChange={(next) => updateQuantity(item.productSlug, Math.min(MAX_ORDER_QUANTITY, next))}
-                max={MAX_ORDER_QUANTITY}
-              />
-              <p className="w-20 text-right text-sm font-medium tabular-nums text-ink">
-                {formatPrice(item.price * item.quantity)}
-              </p>
-              <button
-                type="button"
-                onClick={() => removeItem(item.productSlug)}
-                aria-label={`Remove ${item.name} from cart`}
-                className="text-ink-soft transition-colors hover:text-red-600"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="mt-8 flex items-center justify-between border-t border-border-soft/70 pt-6">

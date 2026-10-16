@@ -30,8 +30,11 @@ export function ProductForm({
   const [isActive, setIsActive] = useState(product?.is_active ?? true);
   const [images, setImages] = useState<string[]>(product?.images ?? []);
   const [reelUrl, setReelUrl] = useState(product?.reel_url ?? "");
+  const [reelUrl2, setReelUrl2] = useState(product?.reel_url_2 ?? "");
+  const [keywordsInput, setKeywordsInput] = useState((product?.keywords ?? []).join(", "));
   const [bundleItemIds, setBundleItemIds] = useState<string[]>(product?.bundle_items.map((b) => b.product_id) ?? []);
   const [isCustomisable, setIsCustomisable] = useState(product?.is_customisable ?? false);
+  const [allowCustomerImage, setAllowCustomerImage] = useState(product?.allow_customer_image ?? false);
   const [showInNew, setShowInNew] = useState(product?.show_in_new ?? false);
   const [badges, setBadges] = useState<string[]>(product?.badges ?? []);
   const [whatsIncluded, setWhatsIncluded] = useState(product?.whats_included ?? "");
@@ -68,9 +71,12 @@ export function ProductForm({
       is_active: isActive,
       images,
       reelUrl: reelUrl.trim(),
+      reelUrl2: reelUrl2.trim(),
+      keywords: keywordsInput.split(",").map((k) => k.trim()).filter(Boolean),
       bundleItemIds,
       discountAmount: discountValue,
       isCustomisable,
+      allowCustomerImage: isCustomisable ? allowCustomerImage : false,
       showInNew,
       badges,
       whatsIncluded: whatsIncluded.trim(),
@@ -173,18 +179,41 @@ export function ProductForm({
         </FieldWrapper>
       )}
 
-      <FieldWrapper label="Instagram Reel Link" htmlFor="reelUrl" optional>
+      <FieldWrapper label="Search Keywords / Tags" htmlFor="keywords" optional>
+        <Input
+          id="keywords"
+          type="text"
+          placeholder="e.g. coaster, wedding gift, rakhi, photo frame, resin art, ocean blue"
+          value={keywordsInput}
+          onChange={(e) => setKeywordsInput(e.target.value)}
+        />
+        <p className="mt-1 text-xs text-ink-soft">
+          Separate tags with commas. Customers searching these terms will find this product.
+        </p>
+      </FieldWrapper>
+
+      <FieldWrapper label="Instagram Reel / Video 1 Link" htmlFor="reelUrl" optional>
         <Input
           id="reelUrl"
           type="url"
-          placeholder="https://www.instagram.com/reel/..."
+          placeholder="https://www.instagram.com/reel/... or video URL"
           value={reelUrl}
           onChange={(e) => setReelUrl(e.target.value)}
         />
       </FieldWrapper>
 
-      <div className="flex flex-col gap-2">
-        <label className="flex items-start gap-2 text-sm text-ink">
+      <FieldWrapper label="Instagram Reel / Video 2 Link" htmlFor="reelUrl2" optional>
+        <Input
+          id="reelUrl2"
+          type="url"
+          placeholder="https://www.instagram.com/reel/... or video URL (optional second video)"
+          value={reelUrl2}
+          onChange={(e) => setReelUrl2(e.target.value)}
+        />
+      </FieldWrapper>
+
+      <div className="flex flex-col gap-3 rounded-2xl border border-border-soft bg-cream/50 p-4">
+        <label className="flex items-start gap-2 text-sm text-ink cursor-pointer">
           <input
             type="checkbox"
             checked={isCustomisable}
@@ -192,13 +221,31 @@ export function ProductForm({
             className="mt-0.5 h-4 w-4 accent-ink"
           />
           <span>
-            Customisable
+            <span className="font-medium">Customisable Product</span>
             <span className="block text-xs text-ink-soft">
-              Shows a &quot;Customisable&quot; badge and the price as &quot;₹… onwards&quot;.
+              Shows &quot;Customisable&quot; badge, &quot;₹… onwards&quot; pricing, and displays a customization notes box on the product page.
             </span>
           </span>
         </label>
-        <label className="flex items-start gap-2 text-sm text-ink">
+
+        {isCustomisable && (
+          <label className="ml-6 flex items-start gap-2 border-t border-border-soft/60 pt-2.5 text-sm text-ink cursor-pointer">
+            <input
+              type="checkbox"
+              checked={allowCustomerImage}
+              onChange={(e) => setAllowCustomerImage(e.target.checked)}
+              className="mt-0.5 h-4 w-4 accent-ink"
+            />
+            <span>
+              <span className="font-medium">Allow customer photo upload (e.g. for photo frames / keepsakes)</span>
+              <span className="block text-xs text-ink-soft">
+                Shows an optional photo upload field on the product page for the client to attach their image.
+              </span>
+            </span>
+          </label>
+        )}
+
+        <label className="flex items-start gap-2 border-t border-border-soft/60 pt-2.5 text-sm text-ink cursor-pointer">
           <input
             type="checkbox"
             checked={showInNew}
@@ -206,9 +253,9 @@ export function ProductForm({
             className="mt-0.5 h-4 w-4 accent-ink"
           />
           <span>
-            Show in &quot;New at Spilled Colours&quot;
+            <span className="font-medium">Show in &quot;New at Spilled Colours&quot;</span>
             <span className="block text-xs text-ink-soft">
-              Picked products show first in that homepage section; the newest products fill the rest.
+              Picked products show first in that homepage section; newest products fill the rest.
             </span>
           </span>
         </label>
