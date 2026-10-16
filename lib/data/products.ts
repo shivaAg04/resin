@@ -571,7 +571,7 @@ function designColumns(input: ProductInput) {
     .filter((d) => d.name);
   return {
     design_options: designs.map((d) => d.name),
-    design_images: designs.map((d) => (input.images.includes(d.image) ? d.image : "")),
+    design_images: designs.map((d) => d.image),
   };
 }
 
@@ -770,6 +770,8 @@ export function getDisplayReelsForProduct(product: Product): DisplayReel[] {
  */
 export function getGalleryImagesForProduct(product: Product): string[] {
   const images = new Set(product.images ?? []);
+  // Photos uploaded directly on a design option, so picking that design can show it.
+  for (const image of product.design_images ?? []) if (image) images.add(image);
   for (const item of product.bundle_items) {
     for (const image of item.images ?? []) images.add(image);
   }

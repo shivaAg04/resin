@@ -79,9 +79,6 @@ export async function SiteFooter() {
             links={[
               { href: "/track-order", label: "Track Your Order" },
               { href: "/faq", label: "FAQs" },
-              { href: "/reviews", label: "Reviews" },
-              { href: "/shipping-policy", label: "Shipping" },
-              { href: "/refund-policy", label: "Returns & Cancellation" },
               { href: "/contact-us", label: "Contact Us" },
             ]}
           />
