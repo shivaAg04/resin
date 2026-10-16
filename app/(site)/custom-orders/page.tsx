@@ -19,11 +19,15 @@ export default function CustomOrdersPage() {
           <br />
           just for you.
         </h1>
-        <p className="mt-4 max-w-md text-[15px] leading-relaxed text-ink-soft">
-          Can&apos;t find exactly what you&apos;re looking for? You don&apos;t have to. Tell us your idea, colours,
-          occasion and budget — add a screenshot if you have one — and we&apos;ll come back with options and a quote.
+        <p className="mt-4 max-w-md text-[15px] font-medium text-ink">
+          Can&apos;t find exactly what you&apos;re looking for? You don&apos;t have to.
         </p>
-        <p className="mt-4 rotate-[-3deg] font-script text-3xl text-amber-dark">Send us your reference</p>
+        <p className="mt-2 max-w-md text-[15px] leading-relaxed text-ink-soft">
+          Tell us your idea, colours, occasion, budget or even just a screenshot of something you love. We&apos;ll
+          take it from there &mdash; curating the design, figuring out the details and creating something around
+          your vision.
+        </p>
+        <p className="mt-4 rotate-[-3deg] font-script text-3xl text-amber-dark">Your idea. Our creativity.</p>
 
         <div className="mt-10 hidden rounded-lg border border-border-soft bg-white/70 p-6 lg:block">
           <h2 className="font-display text-lg font-medium uppercase tracking-wide text-ink">How it works</h2>

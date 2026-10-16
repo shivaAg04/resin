@@ -14,7 +14,7 @@ const links = [
   { href: "/admin/reels", label: "Reels", icon: Clapperboard },
   { href: "/admin/testimonials", label: "Testimonials", icon: MessageSquareQuote },
   { href: "/admin/orders", label: "Orders", icon: Receipt },
-  { href: "/admin/custom-requests", label: "Custom Requests", icon: Sparkles },
+  { href: "/admin/custom-requests", label: "Custom & Bulk", icon: Sparkles },
 ];
 
 export function AdminSidebar() {

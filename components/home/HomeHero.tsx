@@ -29,31 +29,32 @@ export function HomeHero({ images }: { images: string[] }) {
           >
             Your idea.
             <br />
-            Our resin.
+            Our creativity.
             <br />
             Something uniquely yours.
           </h1>
           <p
-            className="animate-fade-in-up mt-5 max-w-md text-[15px] leading-relaxed text-ink-soft"
+            className="animate-fade-in-up mt-5 max-w-lg text-[15px] leading-relaxed text-ink-soft"
             style={{ animationDelay: "160ms" }}
           >
-            From personalised gifts and keepsakes to home decor, festive pieces and custom creations — we
-            make resin pieces around your idea, colours, occasion and budget.
+            From personalised gifts and keepsakes to home d&eacute;cor, festive pieces, bulk gifting and
+            completely custom creations &mdash; we turn your ideas into handcrafted pieces designed around
+            your colours, occasion, and vision.
           </p>
           <div
             className="animate-fade-in-up mt-7 flex flex-col gap-3 sm:flex-row"
             style={{ animationDelay: "240ms" }}
           >
-            <ButtonLink href="/custom-orders" size="lg" className="text-xs uppercase tracking-[0.12em]">
-              Create something custom <ArrowRight className="h-4 w-4" />
+            <ButtonLink href="/products" size="lg" className="text-xs uppercase tracking-[0.12em]">
+              Explore Collection <ArrowRight className="h-4 w-4" />
             </ButtonLink>
-            <ButtonLink href="/products" variant="outline" size="lg" className="text-xs uppercase tracking-[0.12em]">
-              Shop the collection
+            <ButtonLink href="/custom-orders" variant="outline" size="lg" className="text-xs uppercase tracking-[0.12em]">
+              Create Something Custom
             </ButtonLink>
           </div>
         </div>
 
-        <div className="relative mx-auto aspect-[5/4] w-full max-w-xl">
+        <div className="relative mx-auto hidden aspect-[5/4] w-full max-w-xl lg:block">
           <p className="absolute -top-2 right-0 z-10 hidden rotate-[-6deg] text-right font-script text-3xl leading-none text-ink-soft lg:block">
             Real ideas.
             <br />

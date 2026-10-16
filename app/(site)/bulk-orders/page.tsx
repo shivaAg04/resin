@@ -36,16 +36,21 @@ export default async function BulkOrdersPage() {
       <section className="bg-gradient-to-br from-lilac via-cream to-amber-light/40">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-2 lg:gap-16">
           <div>
-            <Eyebrow>Bulk &amp; corporate</Eyebrow>
+            <Eyebrow>Bulk &amp; Corporate Gifting</Eyebrow>
             <h1 className="mt-3 font-display text-4xl font-medium uppercase leading-none text-ink sm:text-5xl">
-              Bulk &amp; corporate gifting
-            </h1>
-            <p className="mt-3 text-[11px] font-medium uppercase tracking-[0.2em] text-amber-dark">
               Made for more than one.
+              <br />
+              Designed to feel like yours.
+            </h1>
+            <p className="mt-5 max-w-lg text-[15px] font-medium text-ink">
+              Planning gifting for a wedding, event, festive occasion, corporate celebration, team or clients?
             </p>
-            <p className="mt-5 max-w-md text-[15px] leading-relaxed text-ink-soft">
-              Planning gifting for a wedding, event, festive occasion, team or clients? We create customised resin
-              pieces in quantities for gifting, events and celebrations.
+            <p className="mt-2 max-w-lg text-[15px] leading-relaxed text-ink-soft">
+              At Spilled Colours, we create customised resin products in quantities &mdash; from thoughtful wedding favours
+              and festive hampers to personalised corporate gifting.
+            </p>
+            <p className="mt-2 max-w-lg text-[15px] leading-relaxed text-ink-soft">
+              Whether you have a complete concept or just a starting idea, we&apos;ll work with you to bring it together.
             </p>
             <ButtonLink href="#quote" size="lg" className={`mt-7 ${buttonCaps}`}>
               Request a bulk quote <ArrowRight className="h-4 w-4" />
@@ -85,16 +90,14 @@ export default async function BulkOrdersPage() {
         <div className="flex flex-col justify-center rounded-lg bg-lilac p-6 sm:p-8">
           <p className="font-script text-3xl leading-none text-amber-dark">Already have a reference?</p>
           <p className="mt-3 text-sm leading-relaxed text-ink-soft">
-            Send it our way and we&apos;ll suggest the best options for your event — designs, colours, packaging and
+            Share it with us in the form below and we&apos;ll suggest the best options for your event &mdash; designs, colours, packaging and
             pricing for your quantity.
           </p>
           <ButtonLink
-            href={referenceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#quote"
             className={`mt-5 self-start ${buttonCaps}`}
           >
-            Send your reference <ArrowRight className="h-4 w-4" />
+            Request a bulk quote <ArrowRight className="h-4 w-4" />
           </ButtonLink>
         </div>
       </section>
@@ -121,7 +124,7 @@ export default async function BulkOrdersPage() {
         <div className="mx-auto max-w-2xl px-4 py-14 sm:px-6 sm:py-16">
           <h2 className="font-display text-3xl font-medium uppercase text-ink">Request a bulk quote</h2>
           <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-            Tell us what you need and we&apos;ll get back to you on WhatsApp with options and pricing.
+            Tell us what you need and our team will review the details and reach out with custom options and pricing.
           </p>
           <div className="mt-8 rounded-lg border border-border-soft/70 bg-white p-5 sm:p-6">
             <BulkOrderForm />

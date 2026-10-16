@@ -81,9 +81,9 @@ export function CustomOrderSection({ images }: { images: string[] }) {
       <div className="grid items-center gap-8 rounded-lg bg-lilac p-6 sm:grid-cols-[0.7fr_1.3fr] sm:p-8">
         <div className="relative mx-auto aspect-square w-full max-w-[220px]">
           <p className="absolute -top-3 right-0 z-10 rotate-[-8deg] font-script text-2xl leading-none text-ink-soft">
-            Send us your
+            Your idea.
             <br />
-            reference
+            Our creativity.
           </p>
           {images.slice(0, 3).map((src, i) => (
             <div
@@ -107,11 +107,11 @@ export function CustomOrderSection({ images }: { images: string[] }) {
             Can&apos;t find exactly what you&apos;re looking for?
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-ink-soft">
-            That&apos;s okay. You don&apos;t have to. Send us a reference, your colour palette, occasion, budget or
-            just an idea — we&apos;ll create it for you.
+            You don&apos;t have to. Tell us your idea, colours, occasion, budget or even just a screenshot of something you love &mdash;
+            we&apos;ll take it from there, curating the design and creating something around your vision.
           </p>
           <ButtonLink href="/custom-orders" className={`mt-5 ${buttonCaps}`}>
-            Send your reference <ArrowRight className="h-4 w-4" />
+            Create something custom <ArrowRight className="h-4 w-4" />
           </ButtonLink>
           <ul className="mt-6 flex flex-wrap gap-x-4 gap-y-3">
             {REFERENCE_KINDS.map(({ icon: Icon, label }) => (

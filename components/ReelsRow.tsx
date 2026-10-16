@@ -8,8 +8,10 @@ export function ReelsRow({ reels }: { reels: Reel[] }) {
   return (
     <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
       <div className="mb-8 text-center">
-        <Eyebrow className="justify-center">Straight from our Reels</Eyebrow>
-        <h2 className="mt-2 font-display text-3xl font-medium text-ink sm:text-4xl">On our Instagram page</h2>
+        <Eyebrow className="justify-center">Our creations, on your feed</Eyebrow>
+        <h2 className="mx-auto mt-2 max-w-2xl font-display text-2xl font-medium leading-tight text-ink sm:text-3xl">
+          Watch Spilled Colours come to life through our Instagram Reels.
+        </h2>
       </div>
       <ReelsCarousel reels={reels} />
     </section>

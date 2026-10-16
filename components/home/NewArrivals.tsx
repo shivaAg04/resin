@@ -6,7 +6,7 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import type { Product } from "@/types";
 
-/** "New at Spilled Colours" products, next to the "It's the idea behind it" story teaser. */
+/** "New at Spilled Colours" products, next to the "Where ideas take shape" story teaser. */
 export function NewArrivals({ products, storyImage }: { products: Product[]; storyImage?: string }) {
   return (
     <section className="mx-auto grid max-w-6xl gap-4 px-4 py-14 sm:px-6 lg:grid-cols-[2fr_1fr] lg:py-16">
@@ -40,15 +40,14 @@ export function NewArrivals({ products, storyImage }: { products: Product[]; sto
             <ProductImage src={storyImage} alt="" sizes="240px" className="h-full w-full" />
           </div>
         )}
-        <div className="relative flex max-w-[16rem] flex-col justify-center p-6 sm:p-8">
+        <div className="relative flex max-w-[18rem] flex-col justify-center p-6 sm:p-8">
           <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-ink-soft">More than resin.</p>
           <h2 className="mt-2 font-display text-3xl font-medium uppercase leading-none text-ink">
-            It&apos;s the idea behind it.
+            Where ideas take shape.
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-ink-soft">
-            Spilled Colours started with resin and a lot of experimenting. What began as a small creative hobby
-            slowly turned into a business built around creating pieces that don&apos;t have to look like
-            everything else.
+            Spilled Colours started with resin and endless experimenting &mdash; and grew into a brand built
+            around creating pieces that feel personal, unexpected and uniquely yours.
           </p>
           <ButtonLink href="/about" size="sm" className="mt-6 self-start text-[11px] uppercase tracking-[0.12em]">
             Meet Spilled Colours <ArrowRight className="h-3.5 w-3.5" />

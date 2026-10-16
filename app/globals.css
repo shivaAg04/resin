@@ -86,9 +86,30 @@ body {
   animation: slide-in-left 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 32s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in-up,
-  .animate-slide-in-left {
+  .animate-slide-in-left,
+  .animate-marquee {
     animation: none;
   }
 }

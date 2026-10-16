@@ -76,6 +76,54 @@ export async function createCustomRequest(
   return { requestNumber: data.request_number };
 }
 
+export interface BulkRequestInput {
+  customerName: string;
+  whatsappNumber: string;
+  location: string;
+  products: string;
+  quantity: string;
+  requiredDate?: string | null;
+  budget?: string | null;
+  details?: string | null;
+}
+
+/** Saves a bulk order enquiry directly to the database. Runs with the service role. */
+export async function createBulkRequest(
+  input: BulkRequestInput,
+): Promise<{ requestNumber?: string; error?: string }> {
+  const supabase = createAdminClient();
+
+  const detailsFormatted = [
+    input.location ? `City / Country: ${input.location}` : null,
+    input.details ? `Additional Details: ${input.details}` : null,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+
+  const { data, error } = await supabase
+    .from("custom_requests")
+    .insert({
+      customer_name: input.customerName,
+      whatsapp_number: input.whatsappNumber,
+      looking_for: `[Bulk Order] ${input.products}`,
+      occasion: "Bulk & Corporate Gifting",
+      budget: input.budget || "Not specified",
+      quantity: input.quantity,
+      required_date: input.requiredDate || null,
+      preferred_colours: "Bulk Enquiry",
+      details: detailsFormatted || null,
+      reference_images: [],
+    })
+    .select("request_number")
+    .single();
+
+  if (error || !data) {
+    console.error("createBulkRequest error", error);
+    return { error: "We couldn't send your bulk enquiry. Please try again." };
+  }
+  return { requestNumber: data.request_number };
+}
+
 // ------------------------------------------------------------
 // Admin (cookie-bound client; RLS limits these to signed-in admins)
 // ------------------------------------------------------------
