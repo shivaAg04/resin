@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { createBulkRequest } from "@/lib/data/custom-requests";
 import { normalizeAnyWhatsAppNumber } from "@/lib/utils/validation";
+import { queueMetaEvent } from "@/lib/meta/conversions";
+import { metaLeadEventId } from "@/lib/meta/event-ids";
 
 export interface SubmitBulkOrderResult {
   requestNumber?: string;
@@ -59,6 +61,13 @@ export async function submitBulkOrderRequest(input: {
   if (result.error || !result.requestNumber) {
     return { error: result.error ?? "Something went wrong. Please try again." };
   }
+
+  queueMetaEvent({
+    eventName: "Lead",
+    eventId: metaLeadEventId(result.requestNumber),
+    customer: { phone: normalizedPhone, name: input.name },
+    customData: { content_name: "Bulk order" },
+  });
 
   revalidatePath("/admin/custom-requests");
   revalidatePath("/admin");

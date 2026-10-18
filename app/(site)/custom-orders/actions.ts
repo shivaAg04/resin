@@ -8,6 +8,8 @@ import {
   REFERENCE_IMAGE_TYPES,
 } from "@/lib/custom-requests/options";
 import { customRequestSchema } from "@/lib/utils/validation";
+import { queueMetaEvent } from "@/lib/meta/conversions";
+import { metaLeadEventId } from "@/lib/meta/event-ids";
 
 /**
  * Step 1 of a photo upload: hands the browser one-time upload URLs into the
@@ -54,6 +56,13 @@ export async function submitCustomRequest(input: Record<string, unknown>): Promi
 
   const result = await createCustomRequest(parsed.data);
   if (result.error || !result.requestNumber) return { error: result.error ?? "Something went wrong." };
+
+  queueMetaEvent({
+    eventName: "Lead",
+    eventId: metaLeadEventId(result.requestNumber),
+    customer: { phone: parsed.data.whatsappNumber, name: parsed.data.customerName },
+    customData: { content_name: "Custom order" },
+  });
 
   revalidatePath("/admin/custom-requests");
   revalidatePath("/admin");

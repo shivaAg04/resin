@@ -3,6 +3,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { WhatsAppFloatingButton } from "@/components/WhatsAppFloatingButton";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 import { IntroAnimationGate } from "@/components/IntroAnimationGate";
+import { MetaPixel } from "@/components/MetaPixel";
 
 export default function SiteLayout({ children }: LayoutProps<"/">) {
   return (
@@ -13,6 +14,7 @@ export default function SiteLayout({ children }: LayoutProps<"/">) {
       <WhatsAppFloatingButton />
       <ScrollToTopButton />
       <IntroAnimationGate />
+      <MetaPixel />
     </div>
   );
 }

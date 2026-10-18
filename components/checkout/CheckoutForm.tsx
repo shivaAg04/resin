@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { AlertCircle, CreditCard, Loader2 } from "lucide-react";
 import { OrderSummary } from "@/components/checkout/OrderSummary";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { FieldWrapper, Input, Textarea } from "@/components/ui/Field";
 import { customerDetailsSchema, MAX_ORDER_QUANTITY, type CustomerDetailsInput } from "@/lib/utils/validation";
 import { useCart } from "@/lib/cart/context";
+import { trackPixel } from "@/lib/meta/pixel";
 
 const RAZORPAY_KEY_ID = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
 
@@ -130,6 +131,23 @@ export function CheckoutForm({ single }: CheckoutFormProps) {
         customization: item.customization,
         customerImageUrl: item.customerImageUrl,
       }));
+
+  // The cart fills in after hydration, so wait for items before logging the checkout once.
+  const checkoutTracked = useRef(false);
+  const checkoutValue = checkoutItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const checkoutCount = checkoutItems.reduce((sum, item) => sum + item.quantity, 0);
+  const checkoutIds = checkoutItems.map((item) => item.productSlug).join(",");
+  useEffect(() => {
+    if (checkoutTracked.current || !checkoutIds) return;
+    checkoutTracked.current = true;
+    trackPixel("InitiateCheckout", {
+      content_ids: checkoutIds.split(","),
+      content_type: "product",
+      num_items: checkoutCount,
+      value: checkoutValue,
+      currency: "INR",
+    });
+  }, [checkoutIds, checkoutCount, checkoutValue]);
 
   const orderDescription = single
     ? single.productName

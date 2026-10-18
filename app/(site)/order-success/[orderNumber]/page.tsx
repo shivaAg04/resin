@@ -12,6 +12,8 @@ export const metadata: Metadata = {
 };
 
 import { SaveOrderOnSuccess } from "@/components/orders/SaveOrderOnSuccess";
+import { TrackPixelEvent } from "@/components/MetaPixel";
+import { metaPurchaseEventId } from "@/lib/meta/event-ids";
 
 export default async function OrderSuccessPage(props: PageProps<"/order-success/[orderNumber]">) {
   const { orderNumber } = await props.params;
@@ -39,6 +41,20 @@ export default async function OrderSuccessPage(props: PageProps<"/order-success/
         <SaveOrderOnSuccess
           orderNumber={orderNumber}
           phone={confirmation.whatsappNumber}
+        />
+      )}
+
+      {confirmation && searchParams.paid === "1" && (
+        <TrackPixelEvent
+          event="Purchase"
+          eventId={metaPurchaseEventId(orderNumber)}
+          params={{
+            content_type: "product",
+            contents: confirmation.items.map((item) => ({ id: item.productName, quantity: item.quantity })),
+            num_items: confirmation.items.reduce((sum, item) => sum + item.quantity, 0),
+            value: confirmation.totalAmount,
+            currency: "INR",
+          }}
         />
       )}
 

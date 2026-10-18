@@ -3,6 +3,8 @@ import { z } from "zod";
 import { getOrderWithItemsByRazorpayOrderId, markOrderPaid } from "@/lib/data/orders";
 import { verifyPaymentSignature } from "@/lib/payments/razorpay";
 import { encodeOrderConfirmation } from "@/lib/utils/order-confirmation";
+import { queueMetaEvent } from "@/lib/meta/conversions";
+import { metaPurchaseEventId } from "@/lib/meta/event-ids";
 
 const verifySchema = z.object({
   razorpay_order_id: z.string().min(1),
@@ -44,6 +46,20 @@ export async function POST(request: NextRequest) {
   if (order.payment_status !== "paid") {
     await markOrderPaid(razorpay_order_id, razorpay_payment_id);
   }
+
+  queueMetaEvent({
+    eventName: "Purchase",
+    eventId: metaPurchaseEventId(order.order_number),
+    customer: { phone: order.whatsapp_number, name: order.customer_name, city: order.city, pincode: order.pincode },
+    customData: {
+      content_type: "product",
+      contents: order.order_items.map((item) => ({ id: item.product_name, quantity: item.quantity })),
+      num_items: order.order_items.reduce((sum, item) => sum + item.quantity, 0),
+      value: Number(order.total_amount),
+      currency: "INR",
+      order_id: order.order_number,
+    },
+  });
 
   const confirmation = encodeOrderConfirmation({
     orderNumber: order.order_number,

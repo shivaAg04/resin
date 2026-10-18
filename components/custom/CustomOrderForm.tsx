@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
+import { trackPixel } from "@/lib/meta/pixel";
+import { metaLeadEventId } from "@/lib/meta/event-ids";
 import Image from "next/image";
 import { AlertCircle, ArrowRight, CheckCircle2, Loader2, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -161,6 +163,7 @@ export function CustomOrderForm() {
       }
 
       photos.forEach((p) => URL.revokeObjectURL(p.previewUrl));
+      trackPixel("Lead", { content_name: "Custom order" }, metaLeadEventId(result.requestNumber));
       setRequestNumber(result.requestNumber);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {

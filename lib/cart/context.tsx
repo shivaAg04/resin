@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { MAX_ORDER_QUANTITY } from "@/lib/utils/order-limits";
+import { trackPixel } from "@/lib/meta/pixel";
 
 export interface CartItem {
   id?: string;
@@ -91,6 +92,13 @@ export function addToCart(item: Omit<CartItem, "quantity">, quantity = 1) {
       )
     : [...items, { ...item, id: item.id ?? (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : String(Date.now())), quantity: Math.min(MAX_ORDER_QUANTITY, quantity) }];
   notify();
+  trackPixel("AddToCart", {
+    content_ids: [item.productSlug],
+    content_type: "product",
+    content_name: item.name,
+    value: item.price * quantity,
+    currency: "INR",
+  });
 }
 
 export function removeFromCart(identifier: string) {

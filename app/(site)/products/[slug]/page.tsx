@@ -8,6 +8,7 @@ import { ProductReviewsSection } from "@/components/products/ProductReviewsSecti
 import { InstagramEmbed } from "@/components/InstagramEmbed";
 import { InstagramEmbedsLoader } from "@/components/InstagramEmbedsLoader";
 import { Badge } from "@/components/ui/Badge";
+import { TrackPixelEvent } from "@/components/MetaPixel";
 import {
   getActiveProducts,
   getDisplayReelsForProduct,
@@ -67,6 +68,16 @@ export default async function ProductDetailPage(props: PageProps<"/products/[slu
   // Extra bottom padding on mobile clears BuyNowPanel's sticky Buy Now bar.
   return (
     <div className="mx-auto max-w-6xl px-4 pb-24 pt-8 sm:px-6 sm:py-12">
+      <TrackPixelEvent
+        event="ViewContent"
+        params={{
+          content_ids: [product.slug],
+          content_type: "product",
+          content_name: product.name,
+          value: Number(product.price),
+          currency: "INR",
+        }}
+      />
       <nav aria-label="Breadcrumb" className="mb-6 flex flex-wrap items-center gap-1.5 text-xs text-ink-soft">
         <Link href="/" className="hover:text-ink">
           Home
@@ -113,9 +124,6 @@ export default async function ProductDetailPage(props: PageProps<"/products/[slu
                   </span>
                 ))}
               </div>
-            )}
-            {product.description && (
-              <p className="mt-4 line-clamp-4 text-[15px] leading-relaxed text-ink-soft">{product.description}</p>
             )}
           </div>
 

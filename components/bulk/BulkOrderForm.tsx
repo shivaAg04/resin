@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { trackPixel } from "@/lib/meta/pixel";
+import { metaLeadEventId } from "@/lib/meta/event-ids";
 import { CheckCircle2, Loader2, Send } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { FieldWrapper, Input, Textarea } from "@/components/ui/Field";
@@ -66,6 +68,7 @@ export function BulkOrderForm() {
         return;
       }
 
+      trackPixel("Lead", { content_name: "Bulk order" }, metaLeadEventId(result.requestNumber));
       setRequestNumber(result.requestNumber);
       setIsSubmitting(false);
     } catch {
