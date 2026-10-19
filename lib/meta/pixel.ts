@@ -6,41 +6,18 @@
  */
 export const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 
-type Fbq = ((...args: unknown[]) => void) & {
-  callMethod?: (...args: unknown[]) => void;
-  queue: unknown[][];
-  push: Fbq;
-  loaded: boolean;
-  version: string;
-};
+type Fbq = (...args: unknown[]) => void;
 
 declare global {
   interface Window {
     fbq?: Fbq;
-    _fbq?: Fbq;
   }
 }
 
-/**
- * Meta's standard queueing stub: calls made before fbevents.js has loaded are
- * queued and replayed by it, so events fired on mount are never lost.
- */
+/** The fbq queue defined by Meta's base code (MetaPixelSnippet); null when the pixel is off. */
 function getFbq(): Fbq | null {
   if (!META_PIXEL_ID || typeof window === "undefined") return null;
-  if (window.fbq) return window.fbq;
-
-  const fbq = function (...args: unknown[]) {
-    if (fbq.callMethod) fbq.callMethod(...args);
-    else fbq.queue.push(args);
-  } as Fbq;
-  fbq.queue = [];
-  fbq.push = fbq;
-  fbq.loaded = true;
-  fbq.version = "2.0";
-  window.fbq = fbq;
-  window._fbq = fbq;
-  fbq("init", META_PIXEL_ID);
-  return fbq;
+  return window.fbq ?? null;
 }
 
 export type PixelEvent =

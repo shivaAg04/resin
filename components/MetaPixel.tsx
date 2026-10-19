@@ -1,15 +1,20 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import Script from "next/script";
-import { META_PIXEL_ID, trackPixel } from "@/lib/meta/pixel";
+import { trackPixel } from "@/lib/meta/pixel";
 
-/** Loads the Meta pixel, logs a PageView per route, and a Contact for every WhatsApp link click. */
+/**
+ * Logs a PageView on each client-side route change (the base code in
+ * MetaPixelSnippet logs the first one) and a Contact for every WhatsApp link click.
+ */
 export function MetaPixel() {
   const pathname = usePathname();
+  const lastPath = useRef(pathname);
 
   useEffect(() => {
+    if (lastPath.current === pathname) return;
+    lastPath.current = pathname;
     trackPixel("PageView");
   }, [pathname]);
 
@@ -23,8 +28,7 @@ export function MetaPixel() {
     return () => document.removeEventListener("click", onClick, { capture: true });
   }, []);
 
-  if (!META_PIXEL_ID) return null;
-  return <Script src="https://connect.facebook.net/en_US/fbevents.js" strategy="afterInteractive" />;
+  return null;
 }
 
 /** Fires one pixel event when mounted — lets server components (product, order-success pages) track views. */
