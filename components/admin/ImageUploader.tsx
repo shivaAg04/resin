@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import { Loader2, Upload, X } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { uploadImage } from "@/lib/uploads/compress";
 import { cn } from "@/lib/utils/format";
 
 export function ImageUploader({
@@ -22,25 +22,15 @@ export function ImageUploader({
     setUploading(true);
     setError(null);
 
-    const supabase = createClient();
     const uploaded: string[] = [];
 
     for (const file of Array.from(files)) {
-      const ext = file.name.split(".").pop();
-      const path = `${crypto.randomUUID()}.${ext}`;
-
-      const { error: uploadError } = await supabase.storage.from("product-images").upload(path, file, {
-        cacheControl: "3600",
-        upsert: false,
-      });
-
-      if (uploadError) {
-        setError("Some images failed to upload. Please try again.");
+      const result = await uploadImage("products", file);
+      if (!result.url) {
+        setError(result.error ?? "Some images failed to upload. Please try again.");
         continue;
       }
-
-      const { data } = supabase.storage.from("product-images").getPublicUrl(path);
-      uploaded.push(data.publicUrl);
+      uploaded.push(result.url);
     }
 
     onChange([...images, ...uploaded]);

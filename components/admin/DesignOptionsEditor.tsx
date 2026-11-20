@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { ImagePlus, Loader2, Plus, Trash2, X } from "lucide-react";
 import { Input } from "@/components/ui/Field";
-import { createClient } from "@/lib/supabase/client";
+import { uploadImage } from "@/lib/uploads/compress";
 import { cn } from "@/lib/utils/format";
 
 export interface DesignOptionRow {
@@ -72,17 +72,11 @@ function DesignRow({
     setUploading(true);
     setError(null);
 
-    const supabase = createClient();
-    const ext = file.name.split(".").pop();
-    const path = `designs/${crypto.randomUUID()}.${ext}`;
-    const { error: uploadError } = await supabase.storage
-      .from("product-images")
-      .upload(path, file, { cacheControl: "3600", upsert: false });
-
-    if (uploadError) {
-      setError("Upload failed. Please try again.");
+    const result = await uploadImage("designs", file);
+    if (!result.url) {
+      setError(result.error ?? "Upload failed. Please try again.");
     } else {
-      onChange({ image: supabase.storage.from("product-images").getPublicUrl(path).data.publicUrl });
+      onChange({ image: result.url });
     }
     setUploading(false);
     if (inputRef.current) inputRef.current.value = "";

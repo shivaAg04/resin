@@ -2,36 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { MAX_REFERENCE_IMAGE_BYTES, REFERENCE_IMAGE_TYPES } from "@/lib/custom-requests/options";
-
-const CUSTOMER_PHOTO_FOLDERS = ["review-uploads", "customer-uploads"] as const;
-type CustomerPhotoFolder = (typeof CUSTOMER_PHOTO_FOLDERS)[number];
-
-/**
- * Customers aren't signed in, so they can't write to the product-images
- * bucket directly — this hands the browser a one-time upload URL into one
- * of the customer folders instead.
- */
-export async function prepareCustomerPhotoUpload(
-  folder: CustomerPhotoFolder,
-  file: { type: string; size: number },
-): Promise<{ path?: string; token?: string; publicUrl?: string; error?: string }> {
-  if (!CUSTOMER_PHOTO_FOLDERS.includes(folder)) return { error: "Invalid upload." };
-  const ext = REFERENCE_IMAGE_TYPES[file?.type];
-  if (!ext) return { error: "Please upload a JPG, PNG, WEBP or HEIC photo." };
-  if (typeof file.size !== "number" || file.size > MAX_REFERENCE_IMAGE_BYTES) {
-    return { error: "Photo must be under 10 MB." };
-  }
-
-  const supabase = createAdminClient();
-  const storage = supabase.storage.from("product-images");
-  const { data, error } = await storage.createSignedUploadUrl(`${folder}/${crypto.randomUUID()}.${ext}`);
-  if (error || !data) {
-    console.error("prepareCustomerPhotoUpload error", error);
-    return { error: "Couldn't prepare the photo upload. Please try again." };
-  }
-  return { path: data.path, token: data.token, publicUrl: storage.getPublicUrl(data.path).data.publicUrl };
-}
+import { r2FolderUrlPrefix } from "@/lib/r2/server";
 
 export async function submitProductReviewAction(formData: FormData): Promise<{ error?: string; success?: boolean }> {
   const productId = String(formData.get("productId") ?? "").trim();
@@ -45,8 +16,8 @@ export async function submitProductReviewAction(formData: FormData): Promise<{ e
   if (!customerName) return { error: "Please enter your name." };
   if (customerName.length < 2) return { error: "Name must be at least 2 characters." };
 
-  // Only accept photos the form uploaded to our own storage bucket.
-  const allowedImagePrefix = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/review-uploads/`;
+  // Only accept photos the form uploaded to our own image storage.
+  const allowedImagePrefix = r2FolderUrlPrefix("review-uploads");
   if (imageUrl && !imageUrl.startsWith(allowedImagePrefix)) return { error: "Invalid photo. Please upload it again." };
 
   const rating = Math.min(5, Math.max(1, Math.round(ratingRaw) || 5));

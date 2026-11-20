@@ -1,24 +1,11 @@
 "use client";
 
-import { prepareCustomerPhotoUpload } from "@/app/(site)/products/actions";
-import { createClient } from "@/lib/supabase/client";
+import { uploadImage } from "@/lib/uploads/compress";
 
-/** Uploads a customer's photo via a one-time signed URL and returns its public URL. */
+/** Compresses a customer's photo, uploads it to public image storage (R2) and returns its URL. */
 export async function uploadCustomerPhoto(
   folder: "review-uploads" | "customer-uploads",
   file: File,
 ): Promise<{ url?: string; error?: string }> {
-  const prepared = await prepareCustomerPhotoUpload(folder, { type: file.type, size: file.size });
-  if (prepared.error || !prepared.path || !prepared.token || !prepared.publicUrl) {
-    return { error: prepared.error ?? "Could not upload photo. Please try again." };
-  }
-
-  const { error } = await createClient()
-    .storage.from("product-images")
-    .uploadToSignedUrl(prepared.path, prepared.token, file, { contentType: file.type });
-  if (error) {
-    console.error("uploadCustomerPhoto error", error);
-    return { error: "Could not upload photo. Please try again." };
-  }
-  return { url: prepared.publicUrl };
+  return uploadImage(folder, file);
 }
