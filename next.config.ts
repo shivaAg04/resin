@@ -4,6 +4,10 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseHostname = supabaseUrl ? new URL(supabaseUrl).hostname : undefined;
 const r2Url = process.env.R2_PUBLIC_URL;
 const r2Hostname = r2Url ? new URL(r2Url).hostname : undefined;
+// The previous Supabase project still holds a few images the database points
+// at. Allowing its host keeps those pages rendering (next/image throws on an
+// unknown host) until the images are moved to R2; then this can go.
+const legacySupabaseHostname = "fkqwhhzisipdjtlzbihu.supabase.co";
 
 const nextConfig: NextConfig = {
   images: {
@@ -16,6 +20,15 @@ const nextConfig: NextConfig = {
             {
               protocol: "https" as const,
               hostname: supabaseHostname,
+              pathname: "/storage/v1/object/public/**",
+            },
+          ]
+        : []),
+      ...(supabaseHostname !== legacySupabaseHostname
+        ? [
+            {
+              protocol: "https" as const,
+              hostname: legacySupabaseHostname,
               pathname: "/storage/v1/object/public/**",
             },
           ]
