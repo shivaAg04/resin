@@ -5,7 +5,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils/format";
 
-const PLACEHOLDER = "/placeholder-product.svg";
+const PLACEHOLDER = "/placeholder-logo.png";
 
 /** Fired by the design picker so the gallery shows the chosen design's photo. */
 export const SHOW_GALLERY_IMAGE_EVENT = "product-gallery:show";

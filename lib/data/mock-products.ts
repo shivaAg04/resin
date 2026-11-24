@@ -15,6 +15,7 @@ function category(id: string, code: string, name: string, slug: string, homePosi
     code,
     name,
     slug,
+    is_active: true,
     show_on_home: true,
     home_position: homePosition,
     image_url: null,

@@ -30,6 +30,7 @@ export async function getHomeCategories(): Promise<Category[]> {
       .from("categories")
       .select("*")
       .eq("show_on_home", true)
+      .eq("is_active", true)
       .order("home_position", { ascending: true });
 
     if (error) throw error;
@@ -180,6 +181,17 @@ export async function setCategoryShowOnHome(id: string, showOnHome: boolean): Pr
   const { error } = await supabase.from("categories").update({ show_on_home: false }).eq("id", id);
   if (error) {
     console.error("setCategoryShowOnHome error", error);
+    return { error: "Could not update category." };
+  }
+  return {};
+}
+
+/** Shows or hides a category from visitors (see migration 0018). */
+export async function setCategoryActive(id: string, isActive: boolean): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("categories").update({ is_active: isActive }).eq("id", id);
+  if (error) {
+    console.error("setCategoryActive error", error);
     return { error: "Could not update category." };
   }
   return {};

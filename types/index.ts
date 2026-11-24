@@ -20,6 +20,7 @@ export interface Category {
   code: string;
   name: string;
   slug: string;
+  is_active: boolean;
   show_on_home: boolean;
   home_position: number;
   image_url: string | null;

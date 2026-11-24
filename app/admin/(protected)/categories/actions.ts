@@ -7,6 +7,7 @@ import {
   deleteCategory,
   moveCategoryHomePosition,
   renameCategory,
+  setCategoryActive,
   setCategoryHomePosition,
   setCategoryShowOnHome,
   updateCategoryDetails,
@@ -16,6 +17,8 @@ function revalidateCategoryPages() {
   revalidatePath("/admin/categories");
   revalidatePath("/admin/products");
   revalidatePath("/products");
+  // Product pages link to their categories, so an inactive one must drop off them too.
+  revalidatePath("/products/[slug]", "page");
   revalidateCatalog();
   revalidatePath("/");
 }
@@ -45,6 +48,13 @@ export async function updateCategoryDetailsAction(
 export async function deleteCategoryAction(formData: FormData): Promise<void> {
   const id = String(formData.get("id"));
   await deleteCategory(id);
+  revalidateCategoryPages();
+}
+
+export async function toggleCategoryActiveAction(formData: FormData): Promise<void> {
+  const id = String(formData.get("id"));
+  const nextActive = formData.get("nextActive") === "true";
+  await setCategoryActive(id, nextActive);
   revalidateCategoryPages();
 }
 

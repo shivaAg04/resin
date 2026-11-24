@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils/format";
 
-const PLACEHOLDER = "/placeholder-product.svg";
+const PLACEHOLDER = "/placeholder-logo.png";
 
 export function ProductImage({
   src,

@@ -1,5 +1,4 @@
 import { HomeHero } from "@/components/home/HomeHero";
-import { CategoryGrid } from "@/components/home/CategoryGrid";
 import { CustomOrderSection } from "@/components/home/CustomOrderSection";
 import { NewArrivals } from "@/components/home/NewArrivals";
 import { Bestsellers } from "@/components/home/Bestsellers";
@@ -9,7 +8,6 @@ import { CtaBand } from "@/components/home/CtaBand";
 import { HorizontalProductRow } from "@/components/products/HorizontalProductRow";
 import { ReelsRow } from "@/components/ReelsRow";
 import {
-  getActiveCategories,
   getBestsellers,
   getNewArrivals,
   getProductsByCategoryForHome,
@@ -21,9 +19,8 @@ import { getActiveTestimonials } from "@/lib/data/testimonials";
 const NEW_ARRIVALS_COUNT = 5;
 
 export default async function HomePage() {
-  const [homeCategories, categories, recentProducts, bestsellers, reels, testimonials] = await Promise.all([
+  const [homeCategories, recentProducts, bestsellers, reels, testimonials] = await Promise.all([
     getHomeCategories(),
-    getActiveCategories(),
     getNewArrivals(12),
     getBestsellers(),
     getActiveReels(),
@@ -45,7 +42,6 @@ export default async function HomePage() {
   return (
     <div>
       <HomeHero images={photos.slice(0, 3)} />
-      <CategoryGrid categories={categories} />
       <CustomOrderSection images={photos.slice(3, 6).length === 3 ? photos.slice(3, 6) : photos.slice(0, 3)} />
       <NewArrivals products={recentProducts.slice(0, NEW_ARRIVALS_COUNT)} storyImage={photos[photos.length - 1]} />
       <Bestsellers products={bestsellers} />

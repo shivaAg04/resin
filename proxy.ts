@@ -70,6 +70,6 @@ export async function proxy(request: NextRequest) {
 export const config = {
   // Everything except static assets, so maintenance mode can cover every page.
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|icon.png|apple-icon.png|logo.png|cursor-resin.svg|placeholder-product.svg|video/).*)",
+    "/((?!_next/static|_next/image|favicon.ico|icon.png|apple-icon.png|logo.png|cursor-resin.svg|placeholder-logo.png|video/).*)",
   ],
 };

@@ -343,6 +343,7 @@ export async function getActiveCategories(): Promise<Category[]> {
     const { data, error } = await supabase
       .from("categories")
       .select("*, product_categories!inner(products!inner(is_active))")
+      .eq("is_active", true)
       .eq("product_categories.products.is_active", true)
       .order("name");
 

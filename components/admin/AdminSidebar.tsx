@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Clapperboard, LayoutDashboard, MessageSquareQuote, Package, Receipt, Sparkles, Tags } from "lucide-react";
+import { Clapperboard, KeyRound, LayoutDashboard, MessageSquareQuote, Package, Receipt, Sparkles, Tags } from "lucide-react";
 import { cn } from "@/lib/utils/format";
 import { LogoutButton } from "@/components/admin/LogoutButton";
 
@@ -15,6 +15,7 @@ const links = [
   { href: "/admin/testimonials", label: "Testimonials", icon: MessageSquareQuote },
   { href: "/admin/orders", label: "Orders", icon: Receipt },
   { href: "/admin/custom-requests", label: "Custom & Bulk", icon: Sparkles },
+  { href: "/admin/account", label: "Account", icon: KeyRound },
 ];
 
 export function AdminSidebar() {

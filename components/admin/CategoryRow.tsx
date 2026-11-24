@@ -12,6 +12,7 @@ import {
   moveCategoryHomeAction,
   renameCategoryAction,
   setCategoryHomePositionAction,
+  toggleCategoryActiveAction,
   toggleCategoryShowOnHomeAction,
   updateCategoryDetailsAction,
 } from "@/app/admin/(protected)/categories/actions";
@@ -146,6 +147,14 @@ export function CategoryRow({
           </div>
           <span className="font-mono text-xs text-ink-soft/70">{category.code}</span>
           <span className="font-medium text-ink">{category.name}</span>
+          {!category.is_active && (
+            <span
+              title="Hidden from the website. Its products still show under All Products and their other categories."
+              className="rounded-full border border-ink/10 bg-ink/5 px-2 py-0.5 text-xs font-medium text-ink-soft"
+            >
+              Inactive
+            </span>
+          )}
           {emptyOnHome && (
             <span
               title="This category has no active products yet, so its homepage row won't show up until you tag one."
@@ -157,6 +166,16 @@ export function CategoryRow({
         </div>
 
         <div className="flex items-center gap-1">
+          <form action={toggleCategoryActiveAction}>
+            <input type="hidden" name="id" value={category.id} />
+            <input type="hidden" name="nextActive" value={String(!category.is_active)} />
+            <button
+              type="submit"
+              className="rounded-full border border-ink/15 px-3 py-1.5 text-xs font-medium text-ink-soft transition-colors hover:bg-ink/5"
+            >
+              {category.is_active ? "Deactivate" : "Activate"}
+            </button>
+          </form>
           <form action={toggleCategoryShowOnHomeAction}>
             <input type="hidden" name="id" value={category.id} />
             <input type="hidden" name="nextShowOnHome" value={String(!category.show_on_home)} />
