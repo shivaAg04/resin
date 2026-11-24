@@ -11,6 +11,11 @@ const legacySupabaseHostname = "fkqwhhzisipdjtlzbihu.supabase.co";
 
 const nextConfig: NextConfig = {
   images: {
+    // Vercel's free image-optimization quota ran out (uncached images got a
+    // 402), so images are served as-is. Uploads are already shrunk to a
+    // 1600px WebP in the browser (lib/uploads/compress.ts). Remove this to
+    // turn optimization back on (e.g. on a paid plan or a Cloudflare loader).
+    unoptimized: true,
     // AVIF is ~30-50% smaller than WebP; browsers without it still get WebP.
     formats: ["image/avif", "image/webp"],
     qualities: [65, 75, 90],
