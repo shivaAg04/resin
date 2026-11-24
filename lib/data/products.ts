@@ -28,6 +28,7 @@ function mapProductRow(row: Record<string, unknown>): Product {
     keywords: Array.isArray(rest.keywords) ? (rest.keywords as string[]) : [],
     reel_url_2: (rest.reel_url_2 as string) || null,
     allow_customer_image: Boolean(rest.allow_customer_image),
+    out_of_stock: Boolean(rest.out_of_stock),
     design_options: Array.isArray(rest.design_options) ? (rest.design_options as string[]) : [],
     design_images: Array.isArray(rest.design_images) ? (rest.design_images as string[]) : [],
     categories: (product_categories ?? []).map((pc) => pc.categories).filter((c): c is Category => Boolean(c)),
@@ -590,6 +591,7 @@ export async function createProduct(input: ProductInput): Promise<{ product?: Pr
       price,
       discount_amount: (input.bundleItemIds?.length ?? 0) > 0 ? Math.max(0, input.discountAmount ?? 0) : 0,
       is_active: input.is_active,
+      out_of_stock: input.outOfStock ?? false,
       images: input.images,
       reel_url: input.reelUrl ? normalizeReelUrl(input.reelUrl) : null,
       reel_url_2: input.reelUrl2 ? normalizeReelUrl(input.reelUrl2) : null,
@@ -648,6 +650,7 @@ export async function updateProduct(
       price,
       discount_amount: (input.bundleItemIds?.length ?? 0) > 0 ? Math.max(0, input.discountAmount ?? 0) : 0,
       is_active: input.is_active,
+      out_of_stock: input.outOfStock ?? false,
       images: input.images,
       reel_url: input.reelUrl ? normalizeReelUrl(input.reelUrl) : null,
       reel_url_2: input.reelUrl2 ? normalizeReelUrl(input.reelUrl2) : null,
@@ -700,6 +703,16 @@ export async function setProductActive(id: string, isActive: boolean): Promise<{
   const { error } = await supabase.from("products").update({ is_active: isActive }).eq("id", id);
   if (error) {
     console.error("setProductActive error", error);
+    return { error: "Could not update product." };
+  }
+  return {};
+}
+
+export async function setProductOutOfStock(id: string, outOfStock: boolean): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("products").update({ out_of_stock: outOfStock }).eq("id", id);
+  if (error) {
+    console.error("setProductOutOfStock error", error);
     return { error: "Could not update product." };
   }
   return {};

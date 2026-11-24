@@ -33,12 +33,17 @@ export function ProductCard({ product, compact = false }: { product: Product; co
           sizes={compact ? "(min-width: 1024px) 170px, 45vw" : undefined}
           className={`${compact ? "aspect-[4/5]" : "aspect-square"} w-full transition-transform duration-500 group-hover:scale-105`}
         />
+        {product.out_of_stock && (
+          <span className="absolute inset-x-0 bottom-0 bg-ink/75 py-1.5 text-center text-[10px] font-medium uppercase tracking-[0.14em] text-cream">
+            Out of stock
+          </span>
+        )}
         {ribbon && !compact && (
           <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-amber-dark shadow-sm">
             {ribbon}
           </span>
         )}
-        {!compact && !product.design_options?.length && (
+        {!compact && !product.design_options?.length && !product.out_of_stock && (
           <AddToCartButton
             productSlug={product.slug}
             name={product.name}

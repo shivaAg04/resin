@@ -13,6 +13,7 @@ import {
   setProductSortOrderAction,
   toggleProductActiveAction,
   toggleProductBestsellerAction,
+  toggleProductOutOfStockAction,
 } from "./actions";
 import { DeleteProductButton } from "@/components/admin/DeleteProductButton";
 
@@ -94,7 +95,19 @@ export default async function AdminProductsPage(props: PageProps<"/admin/product
                     {product.is_active ? "Active" : "Inactive"}
                   </Badge>
                 </div>
-                <p className="mt-1 text-sm text-ink-soft">{formatPrice(product.price)}</p>
+                <div className="mt-1 flex items-center gap-2">
+                  <p className="text-sm text-ink-soft">{formatPrice(product.price)}</p>
+                  {product.out_of_stock && (
+                    <Badge className="border-red-200 bg-red-50 text-red-700">Out of stock</Badge>
+                  )}
+                  <form action={toggleProductOutOfStockAction} className="ml-auto">
+                    <input type="hidden" name="id" value={product.id} />
+                    <input type="hidden" name="nextOutOfStock" value={String(!product.out_of_stock)} />
+                    <button type="submit" className="text-xs font-medium text-ink-soft underline-offset-2 hover:text-ink hover:underline">
+                      {product.out_of_stock ? "Mark in stock" : "Mark out of stock"}
+                    </button>
+                  </form>
+                </div>
 
                 {product.categories.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1.5">

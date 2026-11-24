@@ -11,6 +11,7 @@ import {
   moveProductSortOrder,
   setProductActive,
   setProductBestseller,
+  setProductOutOfStock,
   setProductSortOrder,
   updateProduct,
 } from "@/lib/data/products";
@@ -65,6 +66,19 @@ export async function toggleProductActiveAction(formData: FormData): Promise<voi
   const id = String(formData.get("id"));
   const nextActive = formData.get("nextActive") === "true";
   await setProductActive(id, nextActive);
+  revalidatePath("/admin/products");
+  revalidatePath("/products");
+  revalidateCatalog();
+  revalidatePath("/");
+  const product = await getProductByIdAdmin(id);
+  if (product) revalidatePath(`/products/${product.slug}`);
+  await revalidateContainingBundles(id);
+}
+
+export async function toggleProductOutOfStockAction(formData: FormData): Promise<void> {
+  const id = String(formData.get("id"));
+  const nextOutOfStock = formData.get("nextOutOfStock") === "true";
+  await setProductOutOfStock(id, nextOutOfStock);
   revalidatePath("/admin/products");
   revalidatePath("/products");
   revalidateCatalog();

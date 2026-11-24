@@ -38,6 +38,9 @@ export async function createOrderFromCheckout(
     if (!product || !product.is_active) {
       return { error: "One of the items in your cart is no longer available. Please review your cart and try again." };
     }
+    if (product.out_of_stock) {
+      return { error: `"${product.name}" is out of stock right now. Please remove it from your cart and try again.` };
+    }
     const unitPrice = Number(product.price);
     const subtotal = Math.round(unitPrice * line.quantity * 100) / 100;
     resolvedItems.push({

@@ -29,6 +29,7 @@ export function ProductForm({
   const [description, setDescription] = useState(product?.description ?? "");
   const [categoryIds, setCategoryIds] = useState<string[]>(product?.categories.map((c) => c.id) ?? []);
   const [isActive, setIsActive] = useState(product?.is_active ?? true);
+  const [outOfStock, setOutOfStock] = useState(product?.out_of_stock ?? false);
   const [images, setImages] = useState<string[]>(product?.images ?? []);
   const [reelUrl, setReelUrl] = useState(product?.reel_url ?? "");
   const [reelUrl2, setReelUrl2] = useState(product?.reel_url_2 ?? "");
@@ -73,6 +74,7 @@ export function ProductForm({
       price: priceValue,
       categoryIds,
       is_active: isActive,
+      outOfStock,
       images,
       reelUrl: reelUrl.trim(),
       reelUrl2: reelUrl2.trim(),
@@ -309,6 +311,17 @@ export function ProductForm({
         >
           <option value="active">Active — visible on the store</option>
           <option value="inactive">Inactive — hidden from customers</option>
+        </Select>
+      </FieldWrapper>
+
+      <FieldWrapper label="Stock" htmlFor="outOfStock">
+        <Select
+          id="outOfStock"
+          value={outOfStock ? "out" : "in"}
+          onChange={(e) => setOutOfStock(e.target.value === "out")}
+        >
+          <option value="in">In stock — customers can order</option>
+          <option value="out">Out of stock — still shown, but can&apos;t be ordered</option>
         </Select>
       </FieldWrapper>
 

@@ -21,6 +21,7 @@ interface BuyNowPanelProps {
   isCustomisable?: boolean;
   allowCustomerImage?: boolean;
   designs?: { name: string; image: string }[];
+  outOfStock?: boolean;
 }
 
 export function BuyNowPanel({
@@ -31,6 +32,7 @@ export function BuyNowPanel({
   isCustomisable = false,
   allowCustomerImage = false,
   designs = [],
+  outOfStock = false,
 }: BuyNowPanelProps) {
   const router = useRouter();
   const { addItem } = useCart();
@@ -208,6 +210,17 @@ export function BuyNowPanel({
           </div>
         )}
 
+        {outOfStock ? (
+          <div className="flex flex-col gap-2">
+            <Button disabled size="lg" className="w-full text-xs uppercase tracking-[0.12em]">
+              Out of stock
+            </Button>
+            <p className="text-center text-xs text-ink-soft">
+              This piece is out of stock right now. Message us on WhatsApp to ask when it&apos;s back.
+            </p>
+          </div>
+        ) : (
+          <>
         <div className="flex items-center gap-3">
           <span className="text-sm text-ink-soft">Quantity</span>
           <QuantitySelector quantity={quantity} onChange={setQuantity} max={MAX_ORDER_QUANTITY} />
@@ -227,6 +240,8 @@ export function BuyNowPanel({
           onBeforeAdd={ensureDesignSelected}
           className="h-13 w-full text-xs uppercase tracking-[0.12em]"
         />
+          </>
+        )}
       </div>
 
       {/* Sticky mobile CTA */}
@@ -235,10 +250,18 @@ export function BuyNowPanel({
           <span className="text-xs text-ink-soft">Total</span>
           <span className="font-sans text-lg font-semibold tabular-nums">{formatPrice(price * quantity)}</span>
         </div>
-        <QuantitySelector quantity={quantity} onChange={setQuantity} max={MAX_ORDER_QUANTITY} />
-        <Button onClick={handleBuyNow} className="text-xs uppercase tracking-[0.12em]">
-          Buy Now
-        </Button>
+        {outOfStock ? (
+          <Button disabled className="text-xs uppercase tracking-[0.12em]">
+            Out of stock
+          </Button>
+        ) : (
+          <>
+            <QuantitySelector quantity={quantity} onChange={setQuantity} max={MAX_ORDER_QUANTITY} />
+            <Button onClick={handleBuyNow} className="text-xs uppercase tracking-[0.12em]">
+              Buy Now
+            </Button>
+          </>
+        )}
       </div>
     </>
   );

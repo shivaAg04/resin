@@ -48,6 +48,8 @@ export interface Product {
   price: number;
   discount_amount: number;
   is_active: boolean;
+  /** Marked by the admin; shown with a label and can't be bought. */
+  out_of_stock?: boolean;
   images: string[];
   categories: Category[];
   sort_order: number;
@@ -75,6 +77,7 @@ export type ProductInput = {
   price: number;
   categoryIds: string[];
   is_active: boolean;
+  outOfStock?: boolean;
   images: string[];
   reelUrl?: string;
   reelUrl2?: string;

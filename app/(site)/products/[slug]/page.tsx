@@ -137,6 +137,7 @@ export default async function ProductDetailPage(props: PageProps<"/products/[slu
               image={product.images?.[0]}
               isCustomisable={product.is_customisable}
               allowCustomerImage={product.allow_customer_image}
+              outOfStock={product.out_of_stock}
               designs={(product.design_options ?? []).map((name, i) => ({
                 name,
                 image: product.design_images?.[i] ?? "",
